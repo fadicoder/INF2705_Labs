@@ -1,0 +1,6 @@
+*.o
+build-Linux
+build
+*.exe
+*.elf
+*.bin
