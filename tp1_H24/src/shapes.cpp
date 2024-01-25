@@ -26,9 +26,11 @@ BasicShapeArrays::~BasicShapeArrays()
 
 void BasicShapeArrays::enableAttribute(GLuint index, GLint size, GLsizei stride, GLsizeiptr offset)
 {
-    // TODO Partie 1: Activer un attribut et l'attacher correctement au state du vao.
-    glVertexAttribPointer(index, size, GL_FLOAT, GL_FALSE, stride,  offset);
+    // Partie 1: Activer un attribut et l'attacher correctement au state du vao.
+    glBindVertexArray(this->m_vao);
+    glVertexAttribPointer(index, size, GL_FLOAT, GL_FALSE, stride,  (GLvoid*)offset);
     glEnableVertexAttribArray(index);
+    glBindVertexArray(0);
 }
 
 void BasicShapeArrays::draw(GLenum mode, GLsizei count)
@@ -89,29 +91,36 @@ void BasicShapeMultipleArrays::enableColorAttribute(GLuint index, GLint size, GL
 {
     // Partie 1: Activer l'attribut de couleur et l'attacher correctement au state du vao.
     glBindVertexArray(this->m_vao);
-    glBindBuffer(this->m_colorVbo);
-    glVertexAttribPointer(index, size, GL_FLOAT, GL_FALSE, stride,  offset);
+    glBindBuffer(GL_ARRAY_BUFFER, this->m_colorVbo);
+    glVertexAttribPointer(index, size, GL_FLOAT, GL_FALSE, stride,  &offset);
     glEnableVertexAttribArray(index);
     glBindVertexArray(0);
 }
 
 void BasicShapeMultipleArrays::updateColorData(const GLfloat* color, GLsizeiptr colorByteSize)
 {
-    // TODO Partie 1: Modifier la totalité des données de couleur
-    glBindBuffer(GL_ARRAY_BUFFER, this->m_ebo);
+    // Partie 1: Modifier la totalité des données de couleur
+    glBindBuffer(GL_ARRAY_BUFFER, this->m_colorVbo);
     glBufferData(GL_ARRAY_BUFFER, colorByteSize, color, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 GLfloat* BasicShapeMultipleArrays::mapPosData()
 {
-    // TODO Partie 1: Activer le mapping des données de position
-    
+    // Partie 1: Activer le mapping des données de position
+    glBindBuffer(GL_ARRAY_BUFFER, this->m_posVbo);
+    void* address = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    return (GLfloat*) address;
+
 }
 
 void BasicShapeMultipleArrays::unmapPosData()
 {
-    // TODO Partie 1: Désactiver le mapping des données de position
+    // Partie 1: Désactiver le mapping des données de position
+    glBindBuffer(GL_ARRAY_BUFFER, this->m_posVbo);
+    glUnmapBuffer(GL_ARRAY_BUFFER);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void BasicShapeMultipleArrays::draw(GLenum mode, GLsizei count)
