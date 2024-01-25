@@ -3,22 +3,23 @@
 #include <iostream>
 
 Shader::Shader(GLenum type, const char* code) {
-    // TODO Partie 1: Créer et compiler le code du shader.
+    // Partie 1: Créer et compiler le code du shader.
     // Il est toujours bonne pratique de vérifier s'il y a
     // des erreurs à la fin.
     this->m_id = glCreateShader(type);
-    glCompileShader(this->m_id, 1, code, NULL);
+    glShaderSource(this->m_id, 1, &code, NULL);
+    glCompileShader(this->m_id);
     this->checkError();
 }
     
 Shader::~Shader() {
-    // TODO Partie 1: Suppression du shader.
-    glDeleteShader(this->id);
+    // Partie 1: Suppression du shader.
+    glDeleteShader(this->m_id);
 }
 
 GLuint Shader::id() {
-    // TODO Partie 1: Retourner l'id du shader.
-    return this->id;
+    // Partie 1: Retourner l'id du shader.
+    return this->m_id;
 }
 
 void Shader::checkError() {
@@ -37,40 +38,40 @@ void Shader::checkError() {
 
 
 ShaderProgram::ShaderProgram() {
-    // TODO Partie 1: Créer un programme d'OpenGL.
+    // Partie 1: Créer un programme d'OpenGL.
     this->m_id = glCreateProgram();
     
 }
     
 ShaderProgram::~ShaderProgram(){
-    // TODO Partie 1: Suppression du programme d'OpenGL.
-    glDeleteProgram(this->id);
+    // Partie 1: Suppression du programme d'OpenGL.
+    glDeleteProgram(this->m_id);
 }
     
 void ShaderProgram::use()
 {
-    // TODO Partie 1: Utiliser le programme pour le rendu.
-    glUseProgram(this->id);
+    // Partie 1: Utiliser le programme pour le rendu.
+    glUseProgram(this->m_id);
 }
     
 void ShaderProgram::attachShader(Shader& s)
 {        
-    // TODO Partie 1: Attacher un nouveau shader au programme.
-    glAttachShader(s.id());
+    // Partie 1: Attacher un nouveau shader au programme.
+    glAttachShader(this->m_id, s.id());
 }
     
 void ShaderProgram::link()
 {        
-    // TODO Partie 1: Faire le linking du programme.
+    // Partie 1: Faire le linking du programme.
     // N'oublier pas de tester pour les erreurs.
-    glLinkProgram(this->id);
+    glLinkProgram(this->m_id);
     this->checkError();
 }
 
 GLint ShaderProgram::getUniformLoc(const char* name)
 {
-    // TODO Partie 2: Retourne la location d'un uniform dans le programme
-    glGetUniformLocation(this->id, name);
+    // Partie 2: Retourne la location d'un uniform dans le programme
+    return glGetUniformLocation(this->m_id, name);
 }
     
 void ShaderProgram::checkError()
