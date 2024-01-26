@@ -109,8 +109,8 @@ int main(int argc, char *argv[]) {
     shape1.enableAttribute(0, 3, 0, 0);
 
     BasicShapeArrays shape2(colorTriVertices, sizeof(colorTriVertices));
-    shape2.enableAttribute(0, 3, sizeof(float)*4, 0);
-    shape2.enableAttribute(1, 4, sizeof(float)*3, sizeof(float)*4);
+    shape2.enableAttribute(0, 3, sizeof(float)*7, NULL);
+    shape2.enableAttribute(1, 4, sizeof(float)*7, (void*) sizeof(float)*3);
 
 
     // TODO Partie 2: Instancier le cube ici.
@@ -124,7 +124,7 @@ int main(int argc, char *argv[]) {
     // Partie 2: Activer le depth test.
     glEnable(GL_DEPTH_TEST);
 
-    int selectShape = 1;
+    int selectShape = 2;
     bool isRunning = true;
     while (isRunning) {
         if (w.shouldResize())
