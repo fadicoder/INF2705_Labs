@@ -44,21 +44,20 @@ const GLfloat colorSquareVertices[] = {
     // position et couleur entrelacés en considérant le type 
     // des entrées du vertex shader.
     // Premier triangle
-    -0.5f, -0.5f, 0.0f,
-    0.0f, 0.0f, 1.0f, 0.0f,
-    0.5f, -0.5f, 0.0f,
-    0.0f, 0.0f, 1.0f, 0.0f,
-    -0.5f, 0.5f, 0.0f,
-    0.0f, 0.0f, 1.0f, 0.0f,
+    -0.5f, -0.5f, 0.0f, // bas gauche
+    1.0f, 0.0f, 0.0f, 0.0f, // rouge
+    0.5f, -0.5f, 0.0f, // bas droit
+    0.0f, 1.0f, 0.0f, 0.0f, // vert
+    -0.5f, 0.5f, 0.0f, // haut gauche
+    0.0f, 0.0f, 1.0f, 0.0f, // bleu
 
     // Deuxième triangle
-    0.5f, -0.5f, 0.0f,
-    0.0f, 0.0f, 1.0f, 0.0f,
-    0.5f, 0.5f, 0.0f,
-    0.0f, 0.0f, 1.0f, 0.0f,
-    -0.5f, 0.5f, 0.0f,
-    0.0f, 0.0f, 1.0f, 0.0f,
-
+    0.5f, -0.5f, 0.0f, // bas droit
+    0.0f, 1.0f, 0.0f, 0.0f, // vert
+    0.5f, 0.5f, 0.0f, // haut droit
+    1.0f, 0.0f, 0.0f, 0.0f, // rouge
+    -0.5f, 0.5f, 0.0f, // haut gauche
+    0.0f, 0.0f, 1.0f, 0.0f // bleu
 };
 
 
