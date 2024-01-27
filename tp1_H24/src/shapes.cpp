@@ -60,7 +60,7 @@ BasicShapeMultipleArrays::BasicShapeMultipleArrays(const GLfloat* pos, GLsizeipt
     // this->enablePosAttribute(0, 3, posByteSize, offsetof(pos, position));
     
     // Couleur
-    glGenBuffers(2, &this->m_colorVbo);
+    glGenBuffers(1, &this->m_colorVbo);
     glBindBuffer(GL_ARRAY_BUFFER, this->m_colorVbo);
     
     glBufferData(GL_ARRAY_BUFFER, colorByteSize, color, GL_STATIC_DRAW);
@@ -81,6 +81,7 @@ BasicShapeMultipleArrays::~BasicShapeMultipleArrays()
 void BasicShapeMultipleArrays::enablePosAttribute(GLuint index, GLint size, GLsizei stride, GLsizeiptr offset)
 {
     // Partie 1: Activer l'attribut de position et l'attacher correctement au state du vao.
+    glBindVertexArray(this->m_vao);
     glBindBuffer(GL_ARRAY_BUFFER, this->m_posVbo);
     glVertexAttribPointer(index, size, GL_FLOAT, GL_FALSE, stride,  (GLvoid*)offset);
     glEnableVertexAttribArray(index);
@@ -100,17 +101,21 @@ void BasicShapeMultipleArrays::enableColorAttribute(GLuint index, GLint size, GL
 void BasicShapeMultipleArrays::updateColorData(const GLfloat* color, GLsizeiptr colorByteSize)
 {
     // Partie 1: Modifier la totalité des données de couleur
+    glBindVertexArray(this->m_vao);
     glBindBuffer(GL_ARRAY_BUFFER, this->m_colorVbo);
-    glBufferData(GL_ARRAY_BUFFER, colorByteSize, color, GL_STATIC_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, colorByteSize, color);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 }
 
 GLfloat* BasicShapeMultipleArrays::mapPosData()
 {
     // Partie 1: Activer le mapping des données de position
+    glBindVertexArray(this->m_vao);
     glBindBuffer(GL_ARRAY_BUFFER, this->m_posVbo);
     void* address = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
     return (GLfloat*) address;
 
 }
@@ -118,9 +123,11 @@ GLfloat* BasicShapeMultipleArrays::mapPosData()
 void BasicShapeMultipleArrays::unmapPosData()
 {
     // Partie 1: Désactiver le mapping des données de position
+    glBindVertexArray(this->m_vao);
     glBindBuffer(GL_ARRAY_BUFFER, this->m_posVbo);
     glUnmapBuffer(GL_ARRAY_BUFFER);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 }
 
 void BasicShapeMultipleArrays::draw(GLenum mode, GLsizei count)
@@ -176,7 +183,7 @@ void BasicShapeElements::draw(GLenum mode, GLsizei count)
     // TODO Partie 1: Dessiner la forme avec le ebo.
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->m_ebo);
     glDrawArrays(mode, 0, count);
-    glBindBuffer(this->m_ebo, mode);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 

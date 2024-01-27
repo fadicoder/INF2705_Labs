@@ -98,7 +98,9 @@ int main(int argc, char *argv[]) {
             // Partie 1: Remplir adéquatement le tableau.
             // Vous pouvez expérimenter avec une couleur uniforme
             // de votre choix ou plusieurs différentes en chaque points.
-            0.5, 0.64, 0.22, 1.0
+            1.0f, 1.0f, 0.0f,
+            1.0f, 1.0f, 0.0f,
+            1.0f, 1.0f, 0.0f
     };
 
     // Partie 1: Instancier vos formes ici.
@@ -116,6 +118,13 @@ int main(int argc, char *argv[]) {
     shape3.enableAttribute(0, 3, sizeof(float)*7, 0);
     shape3.enableAttribute(1, 4, sizeof(float)*7, (sizeof(float)*3));
 
+    BasicShapeMultipleArrays shape4(triVertices, sizeof(triVertices), onlyColorTriVertices, sizeof(onlyColorTriVertices));
+    shape4.enablePosAttribute(0, 3, 0, 0);
+    shape4.enableColorAttribute(1, 3, 0, 0);
+    GLfloat* posPtr = shape4.mapPosData();
+
+
+
 
     // TODO Partie 2: Instancier le cube ici.
 //    Bas
@@ -123,12 +132,12 @@ int main(int argc, char *argv[]) {
 //    cubeShape.enableAttribute();
 
     // Partie 1: Donner une couleur de remplissage aux fonds.
-    glClearColor(onlyColorTriVertices[0], onlyColorTriVertices[1], onlyColorTriVertices[2], onlyColorTriVertices[3]);
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
     // Partie 2: Activer le depth test.
     glEnable(GL_DEPTH_TEST);
 
-    int selectShape = 3;
+    int selectShape = 0;
     bool isRunning = true;
     while (isRunning) {
         if (w.shouldResize())
@@ -141,14 +150,15 @@ int main(int argc, char *argv[]) {
             selectShape = ++selectShape < 7 ? selectShape : 0;
             std::cout << "Selected shape: " << selectShape << std::endl;
         }
-
+        
         // Partie 1: Mise à jour des données du triangle
         changeRGB(&onlyColorTriVertices[0]);
-//        changeRGB(&onlyColorTriVertices[3]);
-//        changeRGB(&onlyColorTriVertices[6]);
+        changeRGB(&onlyColorTriVertices[3]);
+        changeRGB(&onlyColorTriVertices[6]);
         
-//        changePos(posPtr, cx, cy, dx, dy);
-        //*/
+        changePos(posPtr, cx, cy, dx, dy);
+        shape4.updateColorData(onlyColorTriVertices, sizeof(onlyColorTriVertices));
+        //
 
 
         // TODO Partie 1: Utiliser le bon shader programme selon la forme.
@@ -160,10 +170,10 @@ int main(int argc, char *argv[]) {
                 break;
             case 2:
             case 3:
-                colorProgram.use();
-                break;
             case 4:
             case 5:
+                colorProgram.use();
+                break;
             case 6:
             default:
                 break;
@@ -191,6 +201,8 @@ int main(int argc, char *argv[]) {
                 shape3.draw(GL_TRIANGLES, 6);
                 break;
             case 4:
+                shape4.draw(GL_TRIANGLES, 3);
+                break;
             case 5:
             case 6:
             default:
