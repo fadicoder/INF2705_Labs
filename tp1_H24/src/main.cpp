@@ -158,10 +158,8 @@ int main(int argc, char *argv[]) {
         
         changePos(posPtr, cx, cy, dx, dy);
         shape4.updateColorData(onlyColorTriVertices, sizeof(onlyColorTriVertices));
-        //
 
-
-        // TODO Partie 1: Utiliser le bon shader programme selon la forme.
+        // Partie 1: Utiliser le bon shader programme selon la forme.
         // N'hésiter pas à utiliser le fallthrough du switch case.
         switch (selectShape) {
             case 0:
