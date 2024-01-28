@@ -123,7 +123,9 @@ int main(int argc, char *argv[]) {
     shape4.enableColorAttribute(1, 3, 0, 0);
     GLfloat* posPtr = shape4.mapPosData();
 
-
+    BasicShapeElements shape5(colorSquareVerticesReduced, sizeof(colorSquareVerticesReduced), indexes, sizeof(indexes));
+    shape5.enableAttribute(0, 3, sizeof(float)*7, 0);
+    shape5.enableAttribute(1, 4, sizeof(float)*7, (sizeof(float)*3));
 
 
     // TODO Partie 2: Instancier le cube ici.
@@ -202,6 +204,8 @@ int main(int argc, char *argv[]) {
                 shape4.draw(GL_TRIANGLES, 3);
                 break;
             case 5:
+                shape5.draw(GL_TRIANGLES, 3);
+                break;
             case 6:
             default:
                 break;

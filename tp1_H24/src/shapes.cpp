@@ -146,13 +146,12 @@ BasicShapeElements::BasicShapeElements(const GLfloat* data, GLsizeiptr byteSize,
     // Allouer l'espace nécessaire dans le mode approprié
     // et envoyer les données au gpu.
     glGenBuffers(1, &this->m_vbo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->m_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, this->m_vbo);
     glBufferData(GL_ARRAY_BUFFER, byteSize, data, GL_STATIC_DRAW);
 
     glGenBuffers(1, &this->m_ebo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->m_ebo);
-    glBufferData(GL_ARRAY_BUFFER, indexesByteSize, indexes, GL_STATIC_DRAW);
-//    this->enableAttribute(0, 3, byteSize, 12);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexesByteSize, indexes, GL_STATIC_DRAW);
 }
 
 BasicShapeElements::~BasicShapeElements()
