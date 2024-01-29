@@ -75,15 +75,17 @@ int main(int argc, char *argv[]) {
     // TODO Partie 2: Shader program de transformation.
     // ... transform;
     // ... location;
+//    ShaderProgram transformProgram;
     {
-        // std::string str = readFile("shaders/transform.fs.glsl");
-        // std::string vstr = readFile("shaders/transform.vs.glsl");
+//         std::string str = readFile("shaders/transform.fs.glsl");
+//         std::string vstr = readFile("shaders/transform.vs.glsl");
 
-        // Shader fragShader{GL_FRAGMENT_SHADER, str};
-        // Shader vertShader{GL_VERTEX_SHADER, vstr};
+//         Shader fragShader(GL_FRAGMENT_SHADER, str.c_str());
+//         Shader vertShader(GL_VERTEX_SHADER, vstr.c_str());
 
-        // fragShader.attachShader(vertShader);
-        // fragShader.link();
+//         transformProgram.attachShader(vertShader);
+//         transformProgram.attachShader(fragShader);
+//         transformProgram.link();
     }
 
     // Variables pour la mise à jour, ne pas modifier.
@@ -123,13 +125,15 @@ int main(int argc, char *argv[]) {
     shape4.enableColorAttribute(1, 3, 0, 0);
     GLfloat* posPtr = shape4.mapPosData();
 
-
+    BasicShapeElements shape5(colorSquareVerticesReduced, sizeof(colorSquareVerticesReduced), indexes, sizeof(indexes));
+    shape5.enableAttribute(0, 3, sizeof(float)*7, 0);
+    shape5.enableAttribute(1, 4, sizeof(float)*7, (sizeof(float)*3));
 
 
     // TODO Partie 2: Instancier le cube ici.
-//    Bas
 //    BasicShapeElements cubeShape(cubeVertices, sizeof(cubeVertices), cubeIndexes, sizeof(cubeIndexes));
-//    cubeShape.enableAttribute();
+//    cubeShape.enableAttribute(0, 3, 0, 0);
+//    cubeShape.enableAttribute(0, 3, 0, 12);
 
     // Partie 1: Donner une couleur de remplissage aux fonds.
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -158,10 +162,8 @@ int main(int argc, char *argv[]) {
         
         changePos(posPtr, cx, cy, dx, dy);
         shape4.updateColorData(onlyColorTriVertices, sizeof(onlyColorTriVertices));
-        //
 
-
-        // TODO Partie 1: Utiliser le bon shader programme selon la forme.
+        // Partie 1: Utiliser le bon shader programme selon la forme.
         // N'hésiter pas à utiliser le fallthrough du switch case.
         switch (selectShape) {
             case 0:
@@ -175,6 +177,7 @@ int main(int argc, char *argv[]) {
                 colorProgram.use();
                 break;
             case 6:
+//                transformProgram.use();
             default:
                 break;
         }
@@ -183,7 +186,13 @@ int main(int argc, char *argv[]) {
         if (selectShape == 6) {
             angleDeg += 0.5f;
             // Utiliser glm pour les calculs de matrices.
-            // glm::mat4 matrix;
+            // Dans lemain, il va falloir utiliser la méthodegetUniformLocpour pouvoir connaître la location du uniform dela matrice
+//            glm::mat4 matrix = glGetUniformfv(transformProgram transformProgram.getUniformLoc("mvp"));
+
+//            matrix = glm::rotate(matrix, angleDeg, glm::vec3(0.1, 1.0, 0.1));
+//            matrix = glm::translate(matrix, glm::vec3(0, 0.5, 2));
+//            matrix = glm::scale(matrix, glm::vec3(70, 0.1, 10.0));
+//            glUniformMatrix4fv(matrix);
         }
 
         // Partie 1: Dessiner la forme sélectionnée.
@@ -204,7 +213,11 @@ int main(int argc, char *argv[]) {
                 shape4.draw(GL_TRIANGLES, 3);
                 break;
             case 5:
+                shape5.draw(GL_TRIANGLES, 3);
+                break;
             case 6:
+//                cubeShape.draw(GL_TRIANGLES, 36);
+                break;
             default:
                 break;
         }
