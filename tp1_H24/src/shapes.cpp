@@ -95,6 +95,7 @@ void BasicShapeMultipleArrays::enableColorAttribute(GLuint index, GLint size, GL
     glBindBuffer(GL_ARRAY_BUFFER, this->m_colorVbo);
     glVertexAttribPointer(index, size, GL_FLOAT, GL_FALSE, stride,  &offset);
     glEnableVertexAttribArray(index);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 }
 
