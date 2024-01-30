@@ -153,6 +153,8 @@ BasicShapeElements::BasicShapeElements(const GLfloat* data, GLsizeiptr byteSize,
     glGenBuffers(1, &this->m_ebo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->m_ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexesByteSize, indexes, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 }
 
 BasicShapeElements::~BasicShapeElements()
@@ -168,15 +170,20 @@ BasicShapeElements::~BasicShapeElements()
 void BasicShapeElements::enableAttribute(GLuint index, GLint size, GLsizei stride, GLsizeiptr offset)
 {
     // Partie 1: Activer un attribut et l'attacher correctement au state du vao.
-    glBindBuffer(GL_ARRAY_BUFFER, this->m_vao);
+    glBindVertexArray(this->m_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, this->m_vbo);
     glVertexAttribPointer(index, size, GL_FLOAT, GL_FALSE, stride,  (GLvoid*)offset);
     glEnableVertexAttribArray(index);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 }
 
 void BasicShapeElements::draw(GLenum mode, GLsizei count)
 {
     // Partie 1: Dessiner la forme avec le ebo.
+    glBindVertexArray(this->m_vao);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->m_ebo);
-    glDrawArrays(mode, 0, count);
+    glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_BYTE, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 }

@@ -213,7 +213,7 @@ int main(int argc, char *argv[]) {
                 shape4.draw(GL_TRIANGLES, 3);
                 break;
             case 5:
-                shape5.draw(GL_TRIANGLES, 3);
+                shape5.draw(GL_TRIANGLES, 6);
                 break;
             case 6:
 //                cubeShape.draw(GL_TRIANGLES, 36);
