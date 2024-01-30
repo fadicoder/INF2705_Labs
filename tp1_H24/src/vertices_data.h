@@ -88,7 +88,7 @@ const GLfloat colorSquareVerticesReduced[] = {
 const GLubyte indexes[] = {
     // Partie 1: Définir les indexes pour générer un
     // carré en réutilisant certaines vertices.
-    0, 1, 3, 2
+    0, 1, 2,
     1, 3, 2
 };
 
