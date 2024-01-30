@@ -75,17 +75,17 @@ int main(int argc, char *argv[]) {
     // TODO Partie 2: Shader program de transformation.
     // ... transform;
     // ... location;
-//    ShaderProgram transformProgram;
+    ShaderProgram transformProgram;
     {
-//         std::string str = readFile("shaders/transform.fs.glsl");
-//         std::string vstr = readFile("shaders/transform.vs.glsl");
+        std::string str = readFile("shaders/transform.fs.glsl");
+        std::string vstr = readFile("shaders/transform.vs.glsl");
 
-//         Shader fragShader(GL_FRAGMENT_SHADER, str.c_str());
-//         Shader vertShader(GL_VERTEX_SHADER, vstr.c_str());
+        Shader fragShader(GL_FRAGMENT_SHADER, str.c_str());
+        Shader vertShader(GL_VERTEX_SHADER, vstr.c_str());
 
-//         transformProgram.attachShader(vertShader);
-//         transformProgram.attachShader(fragShader);
-//         transformProgram.link();
+        transformProgram.attachShader(vertShader);
+        transformProgram.attachShader(fragShader);
+        transformProgram.link();
     }
 
     // Variables pour la mise à jour, ne pas modifier.
@@ -129,6 +129,10 @@ int main(int argc, char *argv[]) {
     shape5.enableAttribute(0, 3, sizeof(float)*7, 0);
     shape5.enableAttribute(1, 4, sizeof(float)*7, (sizeof(float)*3));
 
+    BasicShapeElements shape6(cubeVertices, sizeof(cubeVertices), cubeIndexes, sizeof(cubeIndexes));
+    shape6.enableAttribute(0, 3, sizeof(float)*6, 0);
+    shape6.enableAttribute(1, 3, sizeof(float)*6, (sizeof(float)*3));
+    const GLint MATRIX_LOCATION = transformProgram.getUniformLoc("mvp");
 
     // TODO Partie 2: Instancier le cube ici.
 //    BasicShapeElements cubeShape(cubeVertices, sizeof(cubeVertices), cubeIndexes, sizeof(cubeIndexes));
@@ -177,7 +181,8 @@ int main(int argc, char *argv[]) {
                 colorProgram.use();
                 break;
             case 6:
-//                transformProgram.use();
+                transformProgram.use();
+                break;
             default:
                 break;
         }
@@ -187,14 +192,18 @@ int main(int argc, char *argv[]) {
             angleDeg += 0.5f;
             // Utiliser glm pour les calculs de matrices.
             // Dans lemain, il va falloir utiliser la méthodegetUniformLocpour pouvoir connaître la location du uniform dela matrice
-//            glm::mat4 matrix = glGetUniformfv(transformProgram transformProgram.getUniformLoc("mvp"));
+            glm::mat4 model = glm::rotate(glm::mat4(1.0f), glm::radians(angleDeg), glm::vec3(0.1f, 1.0f, 0.1f));
+            // glm::translate(matrix, glm::vec3(0, 0.5, 2));
+            // glm::scale(matrix, glm::vec3(70, 0.1, 10.0));
 
-//            matrix = glm::rotate(matrix, angleDeg, glm::vec3(0.1, 1.0, 0.1));
-//            matrix = glm::translate(matrix, glm::vec3(0, 0.5, 2));
-//            matrix = glm::scale(matrix, glm::vec3(70, 0.1, 10.0));
-//            glUniformMatrix4fv(matrix);
+            glm::mat4 view = glm::lookAt(glm::vec3(0.0f, 0.5f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+            
+            glm::mat4 projection = glm::perspective(70.0f, (float) (w.getWidth()/w.getHeight()), 0.1f, 10.0f);
+            
+            glm::mat4 transformation = projection * view * model;
+            glUniformMatrix4fv(MATRIX_LOCATION, 1.0f, GL_FALSE, (GLfloat*) &transformation);
+            GL_CHECK_ERROR;
         }
-
         // Partie 1: Dessiner la forme sélectionnée.
         switch (selectShape) {
             case 0:
@@ -216,13 +225,12 @@ int main(int argc, char *argv[]) {
                 shape5.draw(GL_TRIANGLES, 6);
                 break;
             case 6:
-//                cubeShape.draw(GL_TRIANGLES, 36);
+                shape6.draw(GL_TRIANGLES, 36);
                 break;
             default:
                 break;
         }
         GL_CHECK_ERROR;
-
         w.swap();
         w.pollEvent();
         isRunning = !w.shouldClose() && !w.getKey(Window::Key::ESC);

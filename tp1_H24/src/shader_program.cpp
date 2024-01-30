@@ -53,7 +53,7 @@ void ShaderProgram::use()
     // Partie 1: Utiliser le programme pour le rendu.
     glUseProgram(this->m_id);
 }
-    
+
 void ShaderProgram::attachShader(Shader& s)
 {        
     // Partie 1: Attacher un nouveau shader au programme.
@@ -71,6 +71,7 @@ void ShaderProgram::link()
 GLint ShaderProgram::getUniformLoc(const char* name)
 {
     // Partie 2: Retourne la location d'un uniform dans le programme
+    glUseProgram(this->m_id);
     return glGetUniformLocation(this->m_id, name);
 }
     
