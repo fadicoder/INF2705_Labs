@@ -21,9 +21,9 @@ void resizeWindowOnChange(Window &w) {
         glViewport(0, 0, w.getWidth(), w.getHeight());
 }
 
-void updateCubeTransformation(Window &w, Camera &camera, glm::vec3 &position, glm::vec2 &orientation, float angleDeg,
+void updateCubeTransformation(Window &w, Camera &camera, glm::vec3 &position, glm::vec2 &orientation, float& angleDeg,
                               const GLint MATRIX_LOCATION) {// Calcul des matrices et envoyer une matrice résultante mvp au shader.
-    angleDeg += 0.5f;
+//    angleDeg += 0.5f;
 
     // Utiliser glm pour les calculs de matrices.
     glm::mat4 model = glm::rotate(glm::mat4(1.0f), glm::radians(angleDeg), glm::vec3(0.1f, 1.0f, 0.1f));
@@ -35,6 +35,20 @@ void updateCubeTransformation(Window &w, Camera &camera, glm::vec3 &position, gl
     glm::mat4 transformation = projection * view  * model;
 
     glUniformMatrix4fv(MATRIX_LOCATION, 1.0f, GL_FALSE, (GLfloat *) &transformation);
+}
+
+void reactToKeys(Window &w, glm::vec3 &position, glm::vec2 &orientation){
+    const float Y_MOVE = 0.1f;
+    const float X_MOVE = 0.1f;
+    if(w.getKeyPress(Window::Key::W)){
+        orientation.y += Y_MOVE;
+    }else if(w.getKeyPress(Window::Key::S)){
+        orientation.y -= Y_MOVE;
+    } else if(w.getKeyPress(Window::Key::A)){
+        orientation.x += X_MOVE;
+    } else if(w.getKeyPress(Window::Key::D)){
+        orientation.x -= X_MOVE;
+    }
 }
 
 
@@ -141,6 +155,8 @@ int main(int argc, char *argv[]) {
 
         // Nettoyer les tampons appropriées.
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        reactToKeys(w, position, orientation);
 
         // Update la transformation du shape6
         updateCubeTransformation(w, camera, position, orientation, angleDeg, MATRIX_LOCATION);
