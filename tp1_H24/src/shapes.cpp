@@ -183,7 +183,7 @@ void BasicShapeElements::draw(GLenum mode, GLsizei count)
     // Partie 1: Dessiner la forme avec le ebo.
     glBindVertexArray(this->m_vao);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->m_ebo);
-    glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_BYTE, 0);
+    glDrawElements(mode, count, GL_UNSIGNED_BYTE, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 }

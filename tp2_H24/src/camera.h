@@ -3,17 +3,17 @@
 
 #include <glm/glm.hpp>
 
-class Camera
-{
+class Camera {
 public:
-    Camera(const glm::vec3& position, const glm::vec2& orientation);
-    
+    Camera(const glm::vec3 &position, const glm::vec2 &orientation);
+
     glm::mat4 getFirstPersonViewMatrix();
+
     glm::mat4 getThirdPersonViewMatrix();
-    
+
 private:
-    const glm::vec3& m_position;
-    const glm::vec2& m_orientation;
+    const glm::vec3 &m_position;
+    const glm::vec2 &m_orientation;
 
 };
 
