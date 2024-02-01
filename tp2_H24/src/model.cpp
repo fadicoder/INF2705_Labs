@@ -1,6 +1,7 @@
 #include "model.h"
 
 #include "obj_loader.h"
+#include "shapes.h"
 #include <iostream>
 
 
