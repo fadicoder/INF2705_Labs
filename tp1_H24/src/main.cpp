@@ -100,9 +100,9 @@ int main(int argc, char *argv[]) {
             // Partie 1: Remplir adéquatement le tableau.
             // Vous pouvez expérimenter avec une couleur uniforme
             // de votre choix ou plusieurs différentes en chaque points.
-            1.0f, 1.0f, 0.0f,
-            1.0f, 1.0f, 0.0f,
-            1.0f, 1.0f, 0.0f
+            1.0f, 0.0f, 0.0f,
+            1.0f, 0.0f, 0.0f,
+            1.0f, 0.0f, 0.0f,
     };
 
     // Partie 1: Instancier vos formes ici.
