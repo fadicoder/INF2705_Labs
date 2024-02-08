@@ -10,7 +10,8 @@ public:
     BasicShapeElements();
     ~BasicShapeElements();
     
-    void enableAttribute(GLuint index, GLint size, GLsizei stride, GLsizeiptr offset);    
+    void enableAttribute(GLuint index, GLint size, GLsizei stride, GLsizeiptr offset);
+    void setData(const GLfloat* data, GLsizeiptr byteSize, const GLuint* indexes, GLsizeiptr indexesByteSize);
     void draw(GLenum mode, GLsizei count);
     
 private:

@@ -11,10 +11,12 @@ Model::Model(const char *path) {
     std::vector<GLuint> indices;
     this->loadObj(path, data, indices);
     this->m_count = (GLsizei) indices.size();
-    this->m_shape = BasicShapeElements((GLfloat*) &data,
+    this->m_shape = BasicShapeElements();
+    this->m_shape.setData((GLfloat*) &data,
                                        (GLsizei) (data.size() * sizeof(GLfloat)),
                                        (GLuint*) &indices,
                                        (GLsizei) (indices.size() * sizeof(GLuint)));
+    this->m_shape.enableAttribute(0, 3, 0, 0);
 }
 
 void Model::loadObj(const char *path, std::vector<GLfloat> &vertexData, std::vector<GLuint> &indices) {
@@ -24,7 +26,7 @@ void Model::loadObj(const char *path, std::vector<GLfloat> &vertexData, std::vec
         std::cout << "Unable to load model " << path << std::endl;
         return;
     }
-
+    std::cout << loadout << std::endl;
     for (auto & loadedVertex: loader.LoadedVertices) {
         objl::Vector3 p = loadedVertex.Position;
         vertexData.push_back(p.X);
@@ -40,5 +42,4 @@ void Model::loadObj(const char *path, std::vector<GLfloat> &vertexData, std::vec
 
 void Model::draw() {
     this->m_shape.draw(GL_TRIANGLES, this->m_count);
-    // TODO: Dessine le modèle en triangle
 }

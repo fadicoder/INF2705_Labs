@@ -21,7 +21,13 @@ BasicShapeElements::BasicShapeElements(const GLfloat *data, GLsizeiptr byteSize,
     glBindVertexArray(0);
 }
 
-BasicShapeElements::BasicShapeElements() {}
+BasicShapeElements::BasicShapeElements() {
+    glGenVertexArrays(1, &this->m_vao);
+    glBindVertexArray(this->m_vao);
+    glGenBuffers(1, &this->m_vbo);
+    glGenBuffers(1, &this->m_ebo);
+    glBindVertexArray(0);
+}
 
 BasicShapeElements::~BasicShapeElements() {
     // Partie 1: Supprimer la mémoire de l'objet.
@@ -39,6 +45,18 @@ void BasicShapeElements::enableAttribute(GLuint index, GLint size, GLsizei strid
     glVertexAttribPointer(index, size, GL_FLOAT, GL_FALSE, stride, (GLvoid *) offset);
     glEnableVertexAttribArray(index);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+}
+
+void BasicShapeElements::setData(const GLfloat *data, GLsizeiptr byteSize, const GLuint *indexes,
+                                 GLsizeiptr indexesByteSize) {
+    glBindVertexArray(this->m_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, this->m_vbo);
+    glBufferData(GL_ARRAY_BUFFER, byteSize, data, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->m_ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexesByteSize, indexes, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 }
 

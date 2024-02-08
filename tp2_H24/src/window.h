@@ -16,6 +16,7 @@ public:
         A = SDLK_a,
         S = SDLK_s,
         D = SDLK_d,
+        SPACE,
     };
     
 public:

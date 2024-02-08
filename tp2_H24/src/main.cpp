@@ -2,35 +2,44 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <random>
+#include <array>
+#include <cmath>
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "window.h"
 #include "shader_program.h"
 #include "vertices_data.h"
 #include "shapes.h"
 #include "camera.h"
+#include "model.h"
+#include "utils.h"
 
 
 #define GL_CHECK_ERROR checkGLError(__FILE__, __LINE__)
+
+static std::random_device rd;  // Will be used to obtain a seed for the random number engine
+static std::mt19937 gen(rd()); // Standard mersenne_twister_engine seeded with rd()
+
 
 void resizeWindowOnChange(Window &w) {
     if (w.shouldResize())
         glViewport(0, 0, w.getWidth(), w.getHeight());
 }
 
-void updateCubeTransformation(Window &w, Camera &camera, glm::vec3 &position, glm::vec2 &orientation, float& angleDeg,
-                              const GLint MATRIX_LOCATION) {// Calcul des matrices et envoyer une matrice résultante mvp au shader.
-//    angleDeg += 0.5f;
-
+void updateTransformation(Window &w, Camera &camera, glm::vec3 &position, glm::vec2 &orientation, float& angleDeg,
+                          const GLint MATRIX_LOCATION) {
+    // Calcul des matrices et envoyer une matrice résultante mvp au shader.
     // Utiliser glm pour les calculs de matrices.
     glm::mat4 model = glm::rotate(glm::mat4(1.0f), glm::radians(angleDeg), glm::vec3(0.1f, 1.0f, 0.1f));
 
     glm::mat4 view = camera.getThirdPersonViewMatrix();
 
-    glm::mat4 projection = glm::perspective(70.0f, (float) (w.getWidth() / w.getHeight()), 0.1f, 10.0f);
+    glm::mat4 projection = glm::perspective(70.0f, (float) (w.getWidth() / w.getHeight()), 0.1f, 200.0f);
 
     glm::mat4 transformation = projection * view  * model;
 
@@ -41,13 +50,13 @@ void reactToKeys(Window &w, glm::vec3 &position, glm::vec2 &orientation){
     const float Y_MOVE = 0.1f;
     const float X_MOVE = 0.1f;
     if(w.getKeyPress(Window::Key::W)){
-        orientation.y += Y_MOVE;
-    }else if(w.getKeyPress(Window::Key::S)){
         orientation.y -= Y_MOVE;
+    }else if(w.getKeyPress(Window::Key::S)){
+        orientation.y += Y_MOVE;
     } else if(w.getKeyPress(Window::Key::A)){
-        orientation.x += X_MOVE;
-    } else if(w.getKeyPress(Window::Key::D)){
         orientation.x -= X_MOVE;
+    } else if(w.getKeyPress(Window::Key::D)){
+        orientation.x += X_MOVE;
     }
 }
 
@@ -102,6 +111,31 @@ std::string readFile(const char *path) {
     return buffer.str();
 }
 
+//std::array<glm::vec3, 7> getGroupRandomPos(int count = 7){
+//    std::uniform_real_distribution<> rnd(-60.0f, 60.0f);
+//
+//    std::array<glm::vec3, 7> positions{
+//            glm::vec3(rnd(gen), 0.0f, rnd(gen)),
+//            glm::vec3(rnd(gen), 0.0f, rnd(gen)),
+//            glm::vec3(-rnd(gen), 0.0f, -rnd(gen)),
+//            glm::vec3(-rnd(gen), 0.0f, -rnd(gen)),
+//            glm::vec3(rnd(gen), 0.0f, -rnd(gen)),
+//            glm::vec3(-rnd(gen), 0.0f, rnd(gen)),
+//            glm::vec3(rnd(gen), 0.0f, -rnd(gen)),
+//    };
+//    return positions;
+//}
+
+
+float getRandomScale(){
+    std::uniform_real_distribution<> rnd(0.7f, 1.3f);
+    return rnd(gen);
+}
+
+float getRandomRotation(){
+    std::uniform_real_distribution<> rnd(0, 2*M_PI);
+    return rnd(gen);
+}
 
 int main(int argc, char *argv[]) {
     Window w;
@@ -129,15 +163,57 @@ int main(int argc, char *argv[]) {
         transformProgram.attachShader(fragShader);
         transformProgram.link();
     }
+
+    // Transform program
+    ShaderProgram modelProgram;
+    {
+        std::string str = readFile("shaders/model.fs.glsl");
+        std::string vstr = readFile("shaders/model.vs.glsl");
+
+        Shader fragShader(GL_FRAGMENT_SHADER, str.c_str());
+        Shader vertShader(GL_VERTEX_SHADER, vstr.c_str());
+
+        modelProgram.attachShader(vertShader);
+        modelProgram.attachShader(fragShader);
+        modelProgram.link();
+    }
     float angleDeg = 0.0f;
 
-    BasicShapeElements shape6(cubeVertices, sizeof(cubeVertices), reinterpret_cast<const GLuint *>(cubeIndexes),
+//    BasicShapeElements shape6(cubeVertices, sizeof(cubeVertices), reinterpret_cast<const GLuint *>(cubeIndexes),
+//                              sizeof(cubeIndexes));
+//    shape6.enableAttribute(0, 3, sizeof(float) * 6, 0);
+//    shape6.enableAttribute(1, 3, sizeof(float) * 6, (sizeof(float) * 3));
+//    const GLint MATRIX_LOCATION = transformProgram.getUniformLoc("mvp");
+//    glm::vec3 position = glm::vec3(0, 0, 0);
+//    glm::vec2 orientation = glm::vec2(0, 0);
+
+    BasicShapeElements ground(groundVertices, sizeof(groundVertices), reinterpret_cast<const GLuint *>(cubeIndexes),
                               sizeof(cubeIndexes));
-    shape6.enableAttribute(0, 3, sizeof(float) * 6, 0);
-    shape6.enableAttribute(1, 3, sizeof(float) * 6, (sizeof(float) * 3));
+    ground.enableAttribute(0, 3, sizeof(float) * 6, 0);
+    ground.enableAttribute(1, 3, sizeof(float) * 6, (sizeof(float) * 3));
     const GLint MATRIX_LOCATION = transformProgram.getUniformLoc("mvp");
-    glm::vec3 position = glm::vec3(0, 0, 0);
+    glm::vec3 position = glm::vec3(0, 1, 0);
     glm::vec2 orientation = glm::vec2(0, 0);
+
+
+    Model tree("../models/tree.obj");
+    const GLint MODEL_MATRIX_LOCATION = modelProgram.getUniformLoc("mvp");
+    const GLint COLOR_LOCATION = modelProgram.getUniformLoc("color");
+    GLfloat color[3] = { 1.0f, 0.0f, 0.0f };
+    glUniform3fv(COLOR_LOCATION, 1.0f, color);
+    glm::mat4 treeTransformMatrix = glm::mat4(1.0f);
+    glUniformMatrix4fv(MODEL_MATRIX_LOCATION, 1.0f, GL_FALSE, (GLfloat*) &treeTransformMatrix);
+//    Model rock("../models/rock.obj");
+//    Model mushroom("../models/mushroom.obj");
+//    Model[] models[] = {
+//            {tree},
+//            {tree},
+//            {tree},
+//            {tree},
+//            {tree},
+//            {tree},
+//            {tree},
+//    };
 
 
     Camera camera(position, orientation);
@@ -150,6 +226,7 @@ int main(int argc, char *argv[]) {
 
     bool isRunning = true;
     transformProgram.use();
+//    modelProgram.use();
     while (isRunning) {
         resizeWindowOnChange(w);
 
@@ -159,10 +236,18 @@ int main(int argc, char *argv[]) {
         reactToKeys(w, position, orientation);
 
         // Update la transformation du shape6
-        updateCubeTransformation(w, camera, position, orientation, angleDeg, MATRIX_LOCATION);
+        updateTransformation(w, camera, position, orientation, angleDeg, MATRIX_LOCATION);
 
-        // Dessine l'image
-        shape6.draw(GL_TRIANGLES, 36);
+//         Dessine l'image
+
+//        shape6.draw(GL_TRIANGLES, 36);
+
+//        modelProgram.use();
+//        tree.draw();
+//        GL_CHECK_ERROR;
+
+        transformProgram.use();
+        ground.draw(GL_TRIANGLES, 36);
         GL_CHECK_ERROR;
 
         // Update la fenetre
