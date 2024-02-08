@@ -31,7 +31,14 @@
 *.app
 
 #other
+*/.idea/
 .idea/
+*/.vscode/
+.vscode/
 build-Linux/
 *.pdf
 *.zip
+*/*.pdf
+*/*.zip
+*/*/*.pdf
+*/*/*.zip
