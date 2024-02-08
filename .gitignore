@@ -33,3 +33,5 @@
 #other
 .idea/
 build-Linux/
+*.pdf
+*.zip
