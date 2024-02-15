@@ -116,12 +116,18 @@ std::string readFile(const char *path) {
 //    return positions;
 //}
 
+glm::mat4 getConstantScale(glm::mat4 transform, float scale) {
+    return glm::scale(transform, glm::vec3(scale, scale, scale));
+}
+
 
 glm::mat4 getRandomScale(glm::mat4 transform) {
     std::uniform_real_distribution<> rnd(0.7f, 1.3f);
     float scale = rnd(gen);
-    return glm::scale(transform, glm::vec3(scale, scale, scale));
+    return getConstantScale(transform, scale);
 }
+
+
 
 glm::mat4 getRandomRotation(glm::mat4 transform) {
     std::uniform_real_distribution<> rnd(0, 2 * M_PI);
@@ -227,12 +233,15 @@ int main(int argc, char *argv[]) {
         glm::vec3 randomPos = glm::vec3(x, -1.0f, z);
         groupsTransform[i] = getRandomScale(getRandomRotation(glm::translate(glm::mat4(1.0f), randomPos)));
         treeTransform[i] = getRandomScale(getRandomRotation(glm::translate(glm::mat4(1.0f), randomPos)));
-        randomPos.x += (float) (rand01() - 0.5);
-        randomPos.z += (float) (rand01() - 0.5);
-        rockTransform[i] = getRandomScale(getRandomRotation(glm::translate(glm::mat4(1.0f), randomPos)));
-        randomPos.x += (float) (rand01() - 0.5);
-        randomPos.z += (float) (rand01() - 0.5);
-        shroomTransform[i] = getRandomScale(getRandomRotation(glm::translate(glm::mat4(1.0f), randomPos)));
+
+        auto rockPos = randomPos;
+        rockPos.y += 0.2;
+        rockTransform[i] = getConstantScale(getRandomRotation(glm::translate(glm::mat4(1.0f), rockPos)), 0.3f);
+
+        auto shroomPos = randomPos;
+        shroomPos.x += 0.3;
+        shroomPos.z += 0.3;
+        shroomTransform[i] = getConstantScale(getRandomRotation(glm::translate(glm::mat4(1.0f), shroomPos)), 0.05);
     }
 
 
