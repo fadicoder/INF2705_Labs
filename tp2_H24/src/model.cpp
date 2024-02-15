@@ -4,6 +4,7 @@
 #include "shapes.h"
 #include <iostream>
 
+Model::Model() : m_count(0){}
 
 Model::Model(const char *path) {
     std::vector<GLfloat> data;

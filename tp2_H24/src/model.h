@@ -7,7 +7,8 @@
 class Model
 {
 public:
-	Model(const char* path);
+    Model();
+	explicit Model(const char* path);
 	void draw();
 
 private:

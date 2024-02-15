@@ -1,4 +1,6 @@
+#include <iostream>
 #include "shapes.h"
+#include "utils.h"
 
 
 BasicShapeElements::BasicShapeElements(const GLfloat *data, GLsizeiptr byteSize, const GLuint *indexes,
@@ -59,7 +61,6 @@ void BasicShapeElements::setData(const GLfloat *data, GLsizeiptr byteSize, const
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->m_ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexesByteSize, indexes, GL_STATIC_DRAW);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 }
 

@@ -43,6 +43,19 @@ void updateTransformation(Window &w, Camera &camera, glm::vec3 &position, glm::v
     glUniformMatrix4fv(MATRIX_LOCATION, 1.0f, GL_FALSE, (GLfloat *) &transformation);
 }
 
+void updateModelMatrix(Window &w, Camera &camera, glm::mat4 &model, const GLint MATRIX_LOCATION) {
+    // Calcul des matrices et envoyer une matrice résultante mvp au shader.
+    // Utiliser glm pour les calculs de matrices.
+
+    glm::mat4 view = camera.getThirdPersonViewMatrix();
+
+    glm::mat4 projection = glm::perspective(70.0f, (float) (w.getWidth() / w.getHeight()), 0.1f, 200.0f);
+
+    glm::mat4 transformation = projection * view * model;
+
+    glUniformMatrix4fv(MATRIX_LOCATION, 1.0f, GL_FALSE, (GLfloat *) &transformation);
+}
+
 void move(Window &w, glm::vec3 &position) {
     const float X_MOVE = 0.5f;
     const float Z_MOVE = 0.5f;
