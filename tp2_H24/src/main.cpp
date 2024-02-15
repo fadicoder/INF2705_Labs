@@ -230,7 +230,7 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < N_GROUPS; i++) {
         float x, z;
         getGroupRandomPos(i, 1, x, z);
-        glm::vec3 randomPos = glm::vec3(x, -1.0f, z);
+        glm::vec3 randomPos = glm::vec3(x, 0.0f, z);
         groupsTransform[i] = getRandomScale(getRandomRotation(glm::translate(glm::mat4(1.0f), randomPos)));
         treeTransform[i] = getRandomScale(getRandomRotation(glm::translate(glm::mat4(1.0f), randomPos)));
 
