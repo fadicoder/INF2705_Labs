@@ -51,8 +51,11 @@ void BasicShapeElements::enableAttribute(GLuint index, GLint size, GLsizei strid
 void BasicShapeElements::setData(const GLfloat *data, GLsizeiptr byteSize, const GLuint *indexes,
                                  GLsizeiptr indexesByteSize) {
     glBindVertexArray(this->m_vao);
+    GL_CHECK_ERROR;
     glBindBuffer(GL_ARRAY_BUFFER, this->m_vbo);
+    GL_CHECK_ERROR;
     glBufferData(GL_ARRAY_BUFFER, byteSize, data, GL_STATIC_DRAW);
+    GL_CHECK_ERROR;
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->m_ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexesByteSize, indexes, GL_STATIC_DRAW);

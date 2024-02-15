@@ -6,15 +6,13 @@
 
 
 Model::Model(const char *path) {
-    // TODO: Initalisation du modèle et des attibuts de la classe
     std::vector<GLfloat> data;
     std::vector<GLuint> indices;
     this->loadObj(path, data, indices);
     this->m_count = (GLsizei) indices.size();
-    this->m_shape = BasicShapeElements();
-    this->m_shape.setData((GLfloat*) &data,
+    this->m_shape.setData(&data[0],
                                        (GLsizei) (data.size() * sizeof(GLfloat)),
-                                       (GLuint*) &indices,
+                                       &indices[0],
                                        (GLsizei) (indices.size() * sizeof(GLuint)));
     this->m_shape.enableAttribute(0, 3, 0, 0);
 }
@@ -26,7 +24,6 @@ void Model::loadObj(const char *path, std::vector<GLfloat> &vertexData, std::vec
         std::cout << "Unable to load model " << path << std::endl;
         return;
     }
-    std::cout << loadout << std::endl;
     for (auto & loadedVertex: loader.LoadedVertices) {
         objl::Vector3 p = loadedVertex.Position;
         vertexData.push_back(p.X);

@@ -9,7 +9,6 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 #include "window.h"
 #include "shader_program.h"
@@ -20,8 +19,6 @@
 #include "utils.h"
 
 
-#define GL_CHECK_ERROR checkGLError(__FILE__, __LINE__)
-
 static std::random_device rd;  // Will be used to obtain a seed for the random number engine
 static std::mt19937 gen(rd()); // Standard mersenne_twister_engine seeded with rd()
 
@@ -31,7 +28,7 @@ void resizeWindowOnChange(Window &w) {
         glViewport(0, 0, w.getWidth(), w.getHeight());
 }
 
-void updateTransformation(Window &w, Camera &camera, glm::vec3 &position, glm::vec2 &orientation, float& angleDeg,
+void updateTransformation(Window &w, Camera &camera, glm::vec3 &position, glm::vec2 &orientation, float &angleDeg,
                           const GLint MATRIX_LOCATION) {
     // Calcul des matrices et envoyer une matrice résultante mvp au shader.
     // Utiliser glm pour les calculs de matrices.
@@ -41,59 +38,39 @@ void updateTransformation(Window &w, Camera &camera, glm::vec3 &position, glm::v
 
     glm::mat4 projection = glm::perspective(70.0f, (float) (w.getWidth() / w.getHeight()), 0.1f, 200.0f);
 
-    glm::mat4 transformation = projection * view  * model;
+    glm::mat4 transformation = projection * view * model;
 
     glUniformMatrix4fv(MATRIX_LOCATION, 1.0f, GL_FALSE, (GLfloat *) &transformation);
 }
 
-void reactToKeys(Window &w, glm::vec3 &position, glm::vec2 &orientation){
-    const float Y_MOVE = 0.1f;
-    const float X_MOVE = 0.1f;
-    if(w.getKeyPress(Window::Key::W)){
-        orientation.y -= Y_MOVE;
-    }else if(w.getKeyPress(Window::Key::S)){
-        orientation.y += Y_MOVE;
-    } else if(w.getKeyPress(Window::Key::A)){
-        orientation.x -= X_MOVE;
-    } else if(w.getKeyPress(Window::Key::D)){
-        orientation.x += X_MOVE;
+void move(Window &w, glm::vec3 &position) {
+    const float X_MOVE = 0.5f;
+    const float Z_MOVE = 0.5f;
+    if (w.getKeyPress(Window::Key::W)) {
+        position.x += X_MOVE;
+    } else if (w.getKeyPress(Window::Key::S)) {
+        position.x -= X_MOVE;
+    } else if (w.getKeyPress(Window::Key::A)) {
+        position.z -= Z_MOVE;
+    } else if (w.getKeyPress(Window::Key::D)) {
+        position.z += Z_MOVE;
     }
 }
 
-
-void checkGLError(const char *file, int line) {
-    GLenum error;
-    while ((error = glGetError()) != GL_NO_ERROR) {
-        std::cerr << "GL_ERROR, File " << file << " (Line " << line << "): ";
-        switch (error) {
-            case GL_INVALID_ENUM:
-                std::cerr << "GL_INVALID_ENUM";
-                break;
-            case GL_INVALID_VALUE:
-                std::cerr << "GL_INVALID_VALUE";
-                break;
-            case GL_INVALID_OPERATION:
-                std::cerr << "GL_INVALID_OPERATION";
-                break;
-            case GL_INVALID_FRAMEBUFFER_OPERATION:
-                std::cerr << "GL_INVALID_FRAMEBUFFER_OPERATION";
-                break;
-            case GL_OUT_OF_MEMORY:
-                std::cerr << "GL_OUT_OF_MEMORY";
-                break;
-            case GL_STACK_UNDERFLOW:
-                std::cerr << "GL_STACK_UNDERFLOW";
-                break;
-            case GL_STACK_OVERFLOW:
-                std::cerr << "GL_STACK_OVERFLOW";
-                break;
-            default:
-                std::cerr << "Unknown gl error occured!";
-                break;
-        }
-        std::cerr << std::endl;
+void look(Window &w, glm::vec2 &orientation) {
+    const float PITCH_MOVE = 0.5f;
+    const float YAW_MOVE = 0.5f;
+    if (w.getKeyPress(Window::Key::UP)) {
+        orientation.x += PITCH_MOVE;
+    } else if (w.getKeyPress(Window::Key::DOWN)) {
+        orientation.x -= PITCH_MOVE;
+    } else if (w.getKeyPress(Window::Key::LEFT)) {
+        orientation.y += YAW_MOVE;
+    } else if (w.getKeyPress(Window::Key::RIGHT)) {
+        orientation.y -= YAW_MOVE;
     }
 }
+
 
 void printGLInfo() {
     std::cout << "OpenGL info:" << std::endl;
@@ -127,14 +104,33 @@ std::string readFile(const char *path) {
 //}
 
 
-float getRandomScale(){
+glm::mat4 getRandomScale(glm::mat4 transform) {
     std::uniform_real_distribution<> rnd(0.7f, 1.3f);
-    return rnd(gen);
+    float scale = rnd(gen);
+    return glm::scale(transform, glm::vec3(scale, scale, scale));
 }
 
-float getRandomRotation(){
-    std::uniform_real_distribution<> rnd(0, 2*M_PI);
-    return rnd(gen);
+glm::mat4 getRandomRotation(glm::mat4 transform) {
+    std::uniform_real_distribution<> rnd(0, 2 * M_PI);
+    float rot = rnd(gen);
+    return glm::rotate(transform, rot, glm::vec3(0.f,1.f,0.f));
+}
+
+void drawSingleModel(Window &w, Camera &camera, Model& model, glm::mat4& transform, const GLint MATRIX_LOCATION){
+    updateModelMatrix(w, camera, transform, MATRIX_LOCATION);
+    model.draw();
+}
+
+void drawGroup(
+        Window &w,
+        Camera &camera,
+        const GLint MATRIX_LOCATION,
+        Model &tree, glm::mat4 &treeTransform,
+        Model &rock,glm::mat4 &rockTransform,
+        Model &mushroom, glm::mat4 &shroomTransform) {
+    drawSingleModel(w, camera, tree, treeTransform, MATRIX_LOCATION);
+    drawSingleModel(w, camera, rock, rockTransform, MATRIX_LOCATION);
+    drawSingleModel(w, camera, mushroom, shroomTransform, MATRIX_LOCATION);
 }
 
 int main(int argc, char *argv[]) {
@@ -179,41 +175,52 @@ int main(int argc, char *argv[]) {
     }
     float angleDeg = 0.0f;
 
-//    BasicShapeElements shape6(cubeVertices, sizeof(cubeVertices), reinterpret_cast<const GLuint *>(cubeIndexes),
-//                              sizeof(cubeIndexes));
-//    shape6.enableAttribute(0, 3, sizeof(float) * 6, 0);
-//    shape6.enableAttribute(1, 3, sizeof(float) * 6, (sizeof(float) * 3));
-//    const GLint MATRIX_LOCATION = transformProgram.getUniformLoc("mvp");
-//    glm::vec3 position = glm::vec3(0, 0, 0);
-//    glm::vec2 orientation = glm::vec2(0, 0);
+    // Cube
+    BasicShapeElements shape6(cubeVertices, sizeof(cubeVertices), cubeIndexes, sizeof(cubeIndexes));
+    shape6.enableAttribute(0, 3, sizeof(float) * 6, 0);
+    shape6.enableAttribute(1, 3, sizeof(float) * 6, (sizeof(float) * 3));
 
-    BasicShapeElements ground(groundVertices, sizeof(groundVertices), reinterpret_cast<const GLuint *>(cubeIndexes),
-                              sizeof(cubeIndexes));
-    ground.enableAttribute(0, 3, sizeof(float) * 6, 0);
-    ground.enableAttribute(1, 3, sizeof(float) * 6, (sizeof(float) * 3));
+    BasicShapeElements ground(groundVertices, sizeof(groundVertices), groundIndexes,
+                              sizeof(groundIndexes));
+    ground.enableAttribute(0, 3, sizeof(float) * 7, 0);
+    ground.enableAttribute(1, 4, sizeof(float) * 7, (sizeof(float) * 3));
+
+    BasicShapeElements river(riverVertices, sizeof(riverVertices), riverIndexes,
+                             sizeof(riverIndexes));
+    river.enableAttribute(0, 3, sizeof(float) * 7, 0);
+    river.enableAttribute(1, 4, sizeof(float) * 7, (sizeof(float) * 3));
     const GLint MATRIX_LOCATION = transformProgram.getUniformLoc("mvp");
+
+    Model suzanne("../models/suzanne.obj");
     glm::vec3 position = glm::vec3(0, 1, 0);
     glm::vec2 orientation = glm::vec2(0, 0);
+    const GLint MODEL_MATRIX_LOCATION = modelProgram.getUniformLoc("mvp");
+//    const GLint COLOR_LOCATION = modelProgram.getUniformLoc("color");
 
 
     Model tree("../models/tree.obj");
-    const GLint MODEL_MATRIX_LOCATION = modelProgram.getUniformLoc("mvp");
-    const GLint COLOR_LOCATION = modelProgram.getUniformLoc("color");
-    GLfloat color[3] = { 1.0f, 0.0f, 0.0f };
-    glUniform3fv(COLOR_LOCATION, 1.0f, color);
-    glm::mat4 treeTransformMatrix = glm::mat4(1.0f);
-    glUniformMatrix4fv(MODEL_MATRIX_LOCATION, 1.0f, GL_FALSE, (GLfloat*) &treeTransformMatrix);
-//    Model rock("../models/rock.obj");
-//    Model mushroom("../models/mushroom.obj");
-//    Model[] models[] = {
-//            {tree},
-//            {tree},
-//            {tree},
-//            {tree},
-//            {tree},
-//            {tree},
-//            {tree},
-//    };
+    Model rock("../models/rock.obj");
+    Model mushroom("../models/mushroom.obj");
+    const int N_ROWS = 7;
+    const int N_GROUPS = N_ROWS * N_ROWS;
+
+    glm::mat4 groupsTransform[N_GROUPS];
+    glm::mat4 treeTransform[N_GROUPS];
+    glm::mat4 rockTransform[N_GROUPS];
+    glm::mat4 shroomTransform[N_GROUPS];
+    for (int i = 0; i < N_GROUPS; i++) {
+        float x, z;
+        getGroupRandomPos(i, 1, x, z);
+        glm::vec3 randomPos = glm::vec3(x, -1.0f, z);
+        groupsTransform[i] = getRandomScale(getRandomRotation(glm::translate(glm::mat4(1.0f), randomPos)));
+        treeTransform[i] = getRandomScale(getRandomRotation(glm::translate(glm::mat4(1.0f), randomPos)));
+        randomPos.x += (float) (rand01() - 0.5);
+        randomPos.z += (float) (rand01() - 0.5);
+        rockTransform[i] = getRandomScale(getRandomRotation(glm::translate(glm::mat4(1.0f), randomPos)));
+        randomPos.x += (float) (rand01() - 0.5);
+        randomPos.z += (float) (rand01() - 0.5);
+        shroomTransform[i] = getRandomScale(getRandomRotation(glm::translate(glm::mat4(1.0f), randomPos)));
+    }
 
 
     Camera camera(position, orientation);
@@ -225,30 +232,30 @@ int main(int argc, char *argv[]) {
     glEnable(GL_DEPTH_TEST);
 
     bool isRunning = true;
-    transformProgram.use();
-//    modelProgram.use();
     while (isRunning) {
         resizeWindowOnChange(w);
 
         // Nettoyer les tampons appropriées.
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        reactToKeys(w, position, orientation);
+        move(w, position);
+        look(w, orientation);
 
-        // Update la transformation du shape6
+        // Update la transformation de la caméra
         updateTransformation(w, camera, position, orientation, angleDeg, MATRIX_LOCATION);
-
-//         Dessine l'image
-
-//        shape6.draw(GL_TRIANGLES, 36);
-
-//        modelProgram.use();
-//        tree.draw();
-//        GL_CHECK_ERROR;
-
         transformProgram.use();
-        ground.draw(GL_TRIANGLES, 36);
-        GL_CHECK_ERROR;
+        shape6.draw(GL_TRIANGLES, 36);
+        ground.draw(GL_TRIANGLES, 6);
+        river.draw(GL_TRIANGLES, 6);
+
+        updateTransformation(w, camera, position, orientation, angleDeg, MODEL_MATRIX_LOCATION);
+        modelProgram.use();
+        suzanne.draw();
+        for (int i = 0; i < N_GROUPS; ++i) {
+            drawGroup(w, camera, MODEL_MATRIX_LOCATION, tree, treeTransform[i], rock, rockTransform[i],
+                      mushroom, shroomTransform[i]);
+        }
+        mushroom.draw();
 
         // Update la fenetre
         w.swap();

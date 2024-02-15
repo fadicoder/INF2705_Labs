@@ -6,7 +6,7 @@ double rand01();
 void getGroupRandomPos(int groupId, const int N_ROWS, float& x, float& z);
 
 // Chemin pour les textures de skybox
-/*
+
 const char* pathes[] = {
 	"../textures/skybox/Daylight Box_Right.bmp",
 	"../textures/skybox/Daylight Box_Left.bmp",
@@ -15,7 +15,6 @@ const char* pathes[] = {
 	"../textures/skybox/Daylight Box_Front.bmp",
 	"../textures/skybox/Daylight Box_Back.bmp",
 };
-*/
 
 // Dans l'initialisation dans le main:
 /*
@@ -59,6 +58,10 @@ const char* pathes[] = {
 // Modèles (autant que possible tous ensembles: tous les arbres, tous les rochés, tous les champignons)
 // HUD (carré/coeur dans l'écran)
 // Skybox - partie 2
+
+#define GL_CHECK_ERROR checkGLError(__FILE__, __LINE__)
+
+void checkGLError(const char *file, int line);
 
 
 #endif // UTILS_H

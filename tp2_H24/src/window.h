@@ -16,6 +16,10 @@ public:
         A = SDLK_a,
         S = SDLK_s,
         D = SDLK_d,
+        UP = SDLK_UP,
+        DOWN = SDLK_DOWN,
+        RIGHT = SDLK_RIGHT,
+        LEFT = SDLK_LEFT,
         SPACE,
     };
     
