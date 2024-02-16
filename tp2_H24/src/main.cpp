@@ -56,31 +56,41 @@ void updateModelMatrix(Window &w, Camera &camera, glm::mat4 &model, const GLint 
     glUniformMatrix4fv(MATRIX_LOCATION, 1.0f, GL_FALSE, (GLfloat *) &transformation);
 }
 
-void move(Window &w, glm::vec3 &position) {
-    const float X_MOVE = 0.5f;
-    const float Z_MOVE = 0.5f;
-    if (w.getKeyPress(Window::Key::W)) {
-        position.x += X_MOVE;
-    } else if (w.getKeyPress(Window::Key::S)) {
-        position.x -= X_MOVE;
-    } else if (w.getKeyPress(Window::Key::A)) {
-        position.z -= Z_MOVE;
-    } else if (w.getKeyPress(Window::Key::D)) {
-        position.z += Z_MOVE;
+void move(Window &w, glm::vec3 &position, glm::vec2 &orientation) {
+    const glm::vec3 orientationVector = glm::vec3(glm::cos(orientation.y), 0, glm::sin(orientation.y));
+    const glm::vec3 perpendicularVector = glm::vec3(-glm::sin(orientation.y), 0, glm::cos(orientation.y));
+    if (w.getKeyHold(Window::Key::W)) {
+        position += orientationVector;
+    } else if (w.getKeyHold(Window::Key::S)) {
+        position -= orientationVector;
+    } else if (w.getKeyHold(Window::Key::A)) {
+        position -= perpendicularVector;
+    } else if (w.getKeyHold(Window::Key::D)) {
+        position += perpendicularVector;
     }
 }
 
 void look(Window &w, glm::vec2 &orientation) {
-    const float PITCH_MOVE = 0.5f;
-    const float YAW_MOVE = 0.5f;
-    if (w.getKeyPress(Window::Key::UP)) {
+    const float PITCH_MOVE = 0.05f;
+    const float YAW_MOVE = 0.05f;
+    bool print = false;
+    if (w.getKeyHold(Window::Key::UP)) {
         orientation.x += PITCH_MOVE;
-    } else if (w.getKeyPress(Window::Key::DOWN)) {
+        print = true;
+    } else if (w.getKeyHold(Window::Key::DOWN)) {
         orientation.x -= PITCH_MOVE;
-    } else if (w.getKeyPress(Window::Key::LEFT)) {
-        orientation.y += YAW_MOVE;
-    } else if (w.getKeyPress(Window::Key::RIGHT)) {
+        print = true;
+    } else if (w.getKeyHold(Window::Key::LEFT)) {
         orientation.y -= YAW_MOVE;
+        print = true;
+    } else if (w.getKeyHold(Window::Key::RIGHT)) {
+        orientation.y += YAW_MOVE;
+        print = true;
+    }
+    if (print) {
+        std::cout << "Start" << std::endl;
+        std::cout << glm::cos(orientation.x) << " : " <<  glm::sin(orientation.x) << std::endl;
+        std::cout << glm::cos(orientation.y) << " : " <<  glm::sin(orientation.y) << std::endl;
     }
 }
 
@@ -260,7 +270,7 @@ int main(int argc, char *argv[]) {
         // Nettoyer les tampons appropriées.
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        move(w, position);
+        move(w, position, orientation);
         look(w, orientation);
 
         // Update la transformation de la caméra
