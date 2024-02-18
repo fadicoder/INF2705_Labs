@@ -17,6 +17,7 @@
 #include "camera.h"
 #include "model.h"
 #include "utils.h"
+#include "textures.h"
 
 
 static std::random_device rd;  // Will be used to obtain a seed for the random number engine
@@ -204,6 +205,11 @@ int main(int argc, char *argv[]) {
     }
     float angleDeg = 0.0f;
 
+    // HUD
+//    BasicShapeElements redSquare(colorSquareVerticesReduced, sizeof(colorSquareVerticesReduced), indexes, sizeof(indexes));
+//    redSquare.enableAttribute(0, 3, sizeof(float)*7, 0);
+//    redSquare.enableAttribute(1, 4, sizeof(float)*7, (sizeof(float)*3));
+
     // Cube
     BasicShapeElements shape6(cubeVertices, sizeof(cubeVertices), cubeIndexes, sizeof(cubeIndexes));
     shape6.enableAttribute(0, 3, sizeof(float) * 6, 0);
@@ -228,8 +234,11 @@ int main(int argc, char *argv[]) {
 
 
     Model tree("../models/tree.obj");
+//    Texture2D texTree("../models/treeTexture.png", GL_CLAMP_TO_EDGE);
     Model rock("../models/rock.obj");
+//    Texture2D texRock("../models/rockTexture.png", GL_CLAMP_TO_EDGE);
     Model mushroom("../models/mushroom.obj");
+//    Texture2D texShroom("../models/mushroomTexture.png", GL_CLAMP_TO_EDGE);
     const int N_ROWS = 7;
     const int N_GROUPS = N_ROWS * N_ROWS;
 
@@ -240,7 +249,7 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < N_GROUPS; i++) {
         float x, z;
         getGroupRandomPos(i, 1, x, z);
-        glm::vec3 randomPos = glm::vec3(x, 0.0f, z);
+        glm::vec3 randomPos = glm::vec3(x, -1.0f, z);
         groupsTransform[i] = getRandomScale(getRandomRotation(glm::translate(glm::mat4(1.0f), randomPos)));
         treeTransform[i] = getRandomScale(getRandomRotation(glm::translate(glm::mat4(1.0f), randomPos)));
 
@@ -262,6 +271,8 @@ int main(int argc, char *argv[]) {
 
     // Partie 2: Activer le depth test.
     glEnable(GL_DEPTH_TEST);
+//    glEnable(GL_CULL_FACE);
+//    glCullFace(GL_FRONT);
 
     bool isRunning = true;
     while (isRunning) {
@@ -282,12 +293,23 @@ int main(int argc, char *argv[]) {
 
         updateTransformation(w, camera, position, orientation, angleDeg, MODEL_MATRIX_LOCATION);
         modelProgram.use();
+        GL_CHECK_ERROR;
+        GL_CHECK_ERROR;
         suzanne.draw();
+        GL_CHECK_ERROR;
+        texSuzanne.unuse();
         for (int i = 0; i < N_GROUPS; ++i) {
             drawGroup(w, camera, MODEL_MATRIX_LOCATION, tree, treeTransform[i], rock, rockTransform[i],
                       mushroom, shroomTransform[i]);
         }
         mushroom.draw();
+        GL_CHECK_ERROR;
+
+        // HUD
+//        transformProgram.use();
+//        glDepthFunc(GL_ALWAYS);
+//        redSquare.draw(GL_TRIANGLES, 6);
+//        glDepthFunc(GL_LESS);
 
         // Update la fenetre
         w.swap();

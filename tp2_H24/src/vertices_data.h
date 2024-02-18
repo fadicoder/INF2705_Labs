@@ -1,6 +1,18 @@
 #ifndef VERTICES_DATA_H
 #define VERTICES_DATA_H
 
+const GLfloat colorSquareVerticesReduced[] = {
+        -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+        0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+        -0.5, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+        0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f
+};
+
+const GLuint indexes[] = {
+        0, 1, 2,
+        1, 3, 2
+};
+
 // On vous donne les vertices et indexes du cube.
 const GLfloat cubeVertices[] = {
         // +z

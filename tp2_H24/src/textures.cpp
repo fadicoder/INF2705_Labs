@@ -11,7 +11,7 @@ Texture2D::Texture2D(const char* path, GLenum wrapMode)
     stbi_set_flip_vertically_on_load(true);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     unsigned char* data = stbi_load(path, &width, &height, &nChannels, 0);
-    if (data == NULL)
+    if (data == nullptr)
         std::cout << "Error loading texture \"" << path << "\": " << stbi_failure_reason() << std::endl;
 
     // TODO: Chargement	de la texture.
@@ -21,7 +21,7 @@ Texture2D::Texture2D(const char* path, GLenum wrapMode)
 
 Texture2D::~Texture2D()
 {
-    // TODO: Supprimer la mémoire de l'objet
+    glDeleteTextures(1, &this->m_id);
 }
 
 void Texture2D::enableMipmap()
@@ -51,19 +51,19 @@ TextureCubeMap::TextureCubeMap(const char** pathes)
     for (unsigned int i = 0; i < 6; i++)
     {
         datas[i] = stbi_load(pathes[i], &widths[i], &heights[i], &nChannels[i], 0);
-        if (datas[i] == NULL)
+        if (datas[i] == nullptr)
             std::cout << "Error loading texture \"" << pathes[i] << "\": " << stbi_failure_reason() << std::endl;
     }
 
-    
+
 	// TODO: Chargement des textures du cubemap.
-	
+
 
     for (unsigned int i = 0; i < 6; i++)
     {
         stbi_image_free(datas[i]);
     }
-    
+
 
 }
 
