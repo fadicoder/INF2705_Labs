@@ -230,8 +230,13 @@ int main(int argc, char *argv[]) {
     glm::vec3 position = glm::vec3(0, 1, 0);
     glm::vec2 orientation = glm::vec2(0, 0);
     const GLint MODEL_MATRIX_LOCATION = modelProgram.getUniformLoc("mvp");
-//    const GLint COLOR_LOCATION = modelProgram.getUniformLoc("color");
 
+    Texture2D texSuzanne("../models/suzanneTexture.png", GL_CLAMP_TO_EDGE);
+    GL_CHECK_ERROR;
+    const GLint TEX_UNIT_LOCATION = modelProgram.getUniformLoc("texSampler");
+    GL_CHECK_ERROR;
+    glUniform1i(TEX_UNIT_LOCATION, 0);
+    GL_CHECK_ERROR;
 
     Model tree("../models/tree.obj");
 //    Texture2D texTree("../models/treeTexture.png", GL_CLAMP_TO_EDGE);
@@ -290,8 +295,8 @@ int main(int argc, char *argv[]) {
         shape6.draw(GL_TRIANGLES, 36);
         ground.draw(GL_TRIANGLES, 6);
         river.draw(GL_TRIANGLES, 6);
-
         updateTransformation(w, camera, position, orientation, angleDeg, MODEL_MATRIX_LOCATION);
+        texSuzanne.use();
         modelProgram.use();
         GL_CHECK_ERROR;
         GL_CHECK_ERROR;
