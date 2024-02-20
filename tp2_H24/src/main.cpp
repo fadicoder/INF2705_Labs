@@ -136,21 +136,23 @@ glm::mat4 getRandomRotation(glm::mat4 transform) {
     return glm::rotate(transform, rot, glm::vec3(0.f,1.f,0.f));
 }
 
-void drawSingleModel(Window &w, Camera &camera, Model& model, glm::mat4& transform, const GLint MATRIX_LOCATION){
+void drawSingleModel(Window &w, Camera &camera, Model& model, Texture2D& tex, glm::mat4& transform, const GLint MATRIX_LOCATION){
     updateModelMatrix(w, camera, transform, MATRIX_LOCATION);
+    tex.use();
     model.draw();
+    Texture2D::unuse();
 }
 
 void drawGroup(
         Window &w,
         Camera &camera,
         const GLint MATRIX_LOCATION,
-        Model &tree, glm::mat4 &treeTransform,
-        Model &rock,glm::mat4 &rockTransform,
-        Model &mushroom, glm::mat4 &shroomTransform) {
-    drawSingleModel(w, camera, tree, treeTransform, MATRIX_LOCATION);
-    drawSingleModel(w, camera, rock, rockTransform, MATRIX_LOCATION);
-    drawSingleModel(w, camera, mushroom, shroomTransform, MATRIX_LOCATION);
+        Model &tree, Texture2D& treeTex, glm::mat4 &treeTransform,
+        Model &rock, Texture2D& rockTex, glm::mat4 &rockTransform,
+        Model &mushroom,  Texture2D& shroomTex, glm::mat4 &shroomTransform) {
+    drawSingleModel(w, camera, tree, treeTex, treeTransform, MATRIX_LOCATION);
+    drawSingleModel(w, camera, rock, rockTex, rockTransform, MATRIX_LOCATION);
+    drawSingleModel(w, camera, mushroom, shroomTex, shroomTransform, MATRIX_LOCATION);
 }
 
 int main(int argc, char *argv[]) {
@@ -229,11 +231,11 @@ int main(int argc, char *argv[]) {
     GL_CHECK_ERROR;
 
     Model tree("../models/tree.obj");
-//    Texture2D texTree("../models/treeTexture.png", GL_CLAMP_TO_EDGE);
+    Texture2D texTree("../models/treeTexture.png", GL_CLAMP_TO_BORDER);
     Model rock("../models/rock.obj");
-//    Texture2D texRock("../models/rockTexture.png", GL_CLAMP_TO_EDGE);
+    Texture2D texRock("../models/rockTexture.png", GL_CLAMP_TO_BORDER);
     Model mushroom("../models/mushroom.obj");
-//    Texture2D texShroom("../models/mushroomTexture.png", GL_CLAMP_TO_EDGE);
+    Texture2D texShroom("../models/mushroomTexture.png", GL_CLAMP_TO_BORDER);
     const int N_ROWS = 7;
     const int N_GROUPS = N_ROWS * N_ROWS;
 
@@ -292,10 +294,10 @@ int main(int argc, char *argv[]) {
         GL_CHECK_ERROR;
         suzanne.draw();
         GL_CHECK_ERROR;
-        texSuzanne.unuse();
+        Texture2D::unuse();
         for (int i = 0; i < N_GROUPS; ++i) {
-            drawGroup(w, camera, MODEL_MATRIX_LOCATION, tree, treeTransform[i], rock, rockTransform[i],
-                      mushroom, shroomTransform[i]);
+            drawGroup(w, camera, MODEL_MATRIX_LOCATION, tree, texTree, treeTransform[i], rock, texRock, rockTransform[i],
+                      mushroom, texShroom, shroomTransform[i]);
         }
         mushroom.draw();
         GL_CHECK_ERROR;
