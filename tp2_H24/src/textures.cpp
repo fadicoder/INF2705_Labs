@@ -19,7 +19,10 @@ Texture2D::Texture2D(const char* path, GLenum wrapMode)
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, this->m_id);
     // il se peut que le format ne soit pas rgba
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &data[0]);
+    // Suzanne, rocks and shrooms does not work with GL_RGB (works with GL_RGBA),
+    // but ground, river (program crash on GL_RGBA, river however does clip with the ground) and trees (broken texture on GL_RGBA) only work with GL_RGB
+    // More format values should be tried
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode);
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );

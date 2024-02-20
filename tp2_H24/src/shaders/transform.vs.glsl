@@ -2,13 +2,13 @@
 
 
 layout(location=0) in vec4 a_position;
-layout(location=1) in vec4 a_color;
+layout(location=1) in vec2 a_texCoord;
 
-out vec4 color;
+out vec2 texCoord;
 
 uniform mat4 mvp;
 
 void main(void){
     gl_Position = mvp * a_position; // projection * view * model * vec4(a_position, 1.0);
-    color = a_color;
+    texCoord = a_texCoord;
 }

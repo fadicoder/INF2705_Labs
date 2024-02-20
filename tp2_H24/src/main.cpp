@@ -203,19 +203,23 @@ int main(int argc, char *argv[]) {
 //    redSquare.enableAttribute(1, 4, sizeof(float)*7, (sizeof(float)*3));
 
     // Cube
-    BasicShapeElements shape6(cubeVertices, sizeof(cubeVertices), cubeIndexes, sizeof(cubeIndexes));
-    shape6.enableAttribute(0, 3, sizeof(float) * 6, 0);
-    shape6.enableAttribute(1, 3, sizeof(float) * 6, (sizeof(float) * 3));
+//    BasicShapeElements shape6(cubeVertices, sizeof(cubeVertices), cubeIndexes, sizeof(cubeIndexes));
+//    shape6.enableAttribute(0, 3, sizeof(float) * 6, 0);
+//    shape6.enableAttribute(1, 3, sizeof(float) * 6, (sizeof(float) * 3));
 
     BasicShapeElements ground(groundVertices, sizeof(groundVertices), groundIndexes,
                               sizeof(groundIndexes));
-    ground.enableAttribute(0, 3, sizeof(float) * 7, 0);
-    ground.enableAttribute(1, 4, sizeof(float) * 7, (sizeof(float) * 3));
+    ground.enableAttribute(0, 3, sizeof(float) * 5, 0);
+    ground.enableAttribute(1, 2, sizeof(float) * 5, (sizeof(float) * 3));
+    GL_CHECK_ERROR;
+    Texture2D groundTex("../textures/groundSeamless.jpg", GL_REPEAT);
+    GL_CHECK_ERROR;
 
     BasicShapeElements river(riverVertices, sizeof(riverVertices), riverIndexes,
                              sizeof(riverIndexes));
-    river.enableAttribute(0, 3, sizeof(float) * 7, 0);
-    river.enableAttribute(1, 4, sizeof(float) * 7, (sizeof(float) * 3));
+    river.enableAttribute(0, 3, sizeof(float) * 5, 0);
+    river.enableAttribute(1, 2, sizeof(float) * 5, (sizeof(float) * 3));
+    Texture2D riverTex("../textures/waterSeamless.jpg", GL_REPEAT);
     const GLint MATRIX_LOCATION = transformProgram.getUniformLoc("mvp");
 
     Model suzanne("../models/suzanne.obj");
@@ -224,11 +228,8 @@ int main(int argc, char *argv[]) {
     const GLint MODEL_MATRIX_LOCATION = modelProgram.getUniformLoc("mvp");
 
     Texture2D texSuzanne("../models/suzanneTexture.png", GL_CLAMP_TO_EDGE);
-    GL_CHECK_ERROR;
     const GLint TEX_UNIT_LOCATION = modelProgram.getUniformLoc("texSampler");
-    GL_CHECK_ERROR;
     glUniform1i(TEX_UNIT_LOCATION, 0);
-    GL_CHECK_ERROR;
 
     Model tree("../models/tree.obj");
     Texture2D texTree("../models/treeTexture.png", GL_CLAMP_TO_BORDER);
@@ -252,14 +253,15 @@ int main(int argc, char *argv[]) {
 
         auto rockPos = randomPos;
         rockPos.y += 0.2;
+        rockPos.x -= 0.5;
+        rockPos.z += 0.1;
         rockTransform[i] = getConstantScale(getRandomRotation(glm::translate(glm::mat4(1.0f), rockPos)), 0.3f);
 
         auto shroomPos = randomPos;
-        shroomPos.x += 0.3;
-        shroomPos.z += 0.3;
+        shroomPos.x += 0.7;
+        shroomPos.z += 0.7;
         shroomTransform[i] = getConstantScale(getRandomRotation(glm::translate(glm::mat4(1.0f), shroomPos)), 0.05);
     }
-
 
     Camera camera(position, orientation);
 
@@ -284,9 +286,15 @@ int main(int argc, char *argv[]) {
         // Update la transformation de la caméra
         updateTransformation(w, camera, position, orientation, angleDeg, MATRIX_LOCATION);
         transformProgram.use();
-        shape6.draw(GL_TRIANGLES, 36);
+//        shape6.draw(GL_TRIANGLES, 36);
+        groundTex.use();
         ground.draw(GL_TRIANGLES, 6);
+        Texture2D::unuse();
+
+        riverTex.use();
         river.draw(GL_TRIANGLES, 6);
+        Texture2D::unuse();
+
         updateTransformation(w, camera, position, orientation, angleDeg, MODEL_MATRIX_LOCATION);
         texSuzanne.use();
         modelProgram.use();
