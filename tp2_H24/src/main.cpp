@@ -102,21 +102,6 @@ std::string readFile(const char *path) {
     return buffer.str();
 }
 
-//std::array<glm::vec3, 7> getGroupRandomPos(int count = 7){
-//    std::uniform_real_distribution<> rnd(-60.0f, 60.0f);
-//
-//    std::array<glm::vec3, 7> positions{
-//            glm::vec3(rnd(gen), 0.0f, rnd(gen)),
-//            glm::vec3(rnd(gen), 0.0f, rnd(gen)),
-//            glm::vec3(-rnd(gen), 0.0f, -rnd(gen)),
-//            glm::vec3(-rnd(gen), 0.0f, -rnd(gen)),
-//            glm::vec3(rnd(gen), 0.0f, -rnd(gen)),
-//            glm::vec3(-rnd(gen), 0.0f, rnd(gen)),
-//            glm::vec3(rnd(gen), 0.0f, -rnd(gen)),
-//    };
-//    return positions;
-//}
-
 glm::mat4 getConstantScale(glm::mat4 transform, float scale) {
     return glm::scale(transform, glm::vec3(scale, scale, scale));
 }
@@ -198,22 +183,16 @@ int main(int argc, char *argv[]) {
     float angleDeg = 0.0f;
 
     // HUD
-//    BasicShapeElements redSquare(colorSquareVerticesReduced, sizeof(colorSquareVerticesReduced), indexes, sizeof(indexes));
-//    redSquare.enableAttribute(0, 3, sizeof(float)*7, 0);
-//    redSquare.enableAttribute(1, 4, sizeof(float)*7, (sizeof(float)*3));
-
-    // Cube
-//    BasicShapeElements shape6(cubeVertices, sizeof(cubeVertices), cubeIndexes, sizeof(cubeIndexes));
-//    shape6.enableAttribute(0, 3, sizeof(float) * 6, 0);
-//    shape6.enableAttribute(1, 3, sizeof(float) * 6, (sizeof(float) * 3));
+    BasicShapeElements redSquare(colorSquareVerticesReduced, sizeof(colorSquareVerticesReduced), indexes, sizeof(indexes));
+    redSquare.enableAttribute(0, 3, sizeof(float)*7, 0);
+    redSquare.enableAttribute(1, 4, sizeof(float)*7, (sizeof(float)*3));
+    Texture2D heartTex("../textures/heart.png", GL_CLAMP_TO_BORDER);
 
     BasicShapeElements ground(groundVertices, sizeof(groundVertices), groundIndexes,
                               sizeof(groundIndexes));
     ground.enableAttribute(0, 3, sizeof(float) * 5, 0);
     ground.enableAttribute(1, 2, sizeof(float) * 5, (sizeof(float) * 3));
-    GL_CHECK_ERROR;
     Texture2D groundTex("../textures/groundSeamless.jpg", GL_REPEAT);
-    GL_CHECK_ERROR;
 
     BasicShapeElements river(riverVertices, sizeof(riverVertices), riverIndexes,
                              sizeof(riverIndexes));
@@ -225,6 +204,7 @@ int main(int argc, char *argv[]) {
     Model suzanne("../models/suzanne.obj");
     glm::vec3 position = glm::vec3(0, 1, 0);
     glm::vec2 orientation = glm::vec2(0, 0);
+    glm::mat4 suzanneTransform = getConstantScale(glm::translate(glm::mat4(1.0f), {0, -1, 0}), 0.6f);
     const GLint MODEL_MATRIX_LOCATION = modelProgram.getUniformLoc("mvp");
 
     Texture2D texSuzanne("../models/suzanneTexture.png", GL_CLAMP_TO_EDGE);
@@ -270,8 +250,6 @@ int main(int argc, char *argv[]) {
 
     // Partie 2: Activer le depth test.
     glEnable(GL_DEPTH_TEST);
-//    glEnable(GL_CULL_FACE);
-//    glCullFace(GL_FRONT);
 
     bool isRunning = true;
     while (isRunning) {
@@ -283,38 +261,43 @@ int main(int argc, char *argv[]) {
         move(w, position, orientation);
         look(w, orientation);
 
-        // Update la transformation de la caméra
-        updateTransformation(w, camera, position, orientation, angleDeg, MATRIX_LOCATION);
+        // 2D elements
+        // Mets la transformation de la caméra
         transformProgram.use();
-//        shape6.draw(GL_TRIANGLES, 36);
+        updateTransformation(w, camera, position, orientation, angleDeg, MATRIX_LOCATION);
+
+        // HUD
+//        heartTex.use();
+//        redSquare.draw(GL_TRIANGLES, 6);
+//        Texture2D::unuse();
+
+        // Sol
         groundTex.use();
         ground.draw(GL_TRIANGLES, 6);
         Texture2D::unuse();
 
+        // Riviere
         riverTex.use();
         river.draw(GL_TRIANGLES, 6);
         Texture2D::unuse();
 
-        updateTransformation(w, camera, position, orientation, angleDeg, MODEL_MATRIX_LOCATION);
-        texSuzanne.use();
+        // 3D elements
         modelProgram.use();
-        GL_CHECK_ERROR;
-        GL_CHECK_ERROR;
+        updateTransformation(w, camera, position, orientation, angleDeg, MODEL_MATRIX_LOCATION);
+
+        // Suzanne
+        updateModelMatrix(w, camera, suzanneTransform, MODEL_MATRIX_LOCATION);
+        texSuzanne.use();
         suzanne.draw();
-        GL_CHECK_ERROR;
         Texture2D::unuse();
+
+        // Vegetation
         for (int i = 0; i < N_GROUPS; ++i) {
             drawGroup(w, camera, MODEL_MATRIX_LOCATION, tree, texTree, treeTransform[i], rock, texRock, rockTransform[i],
                       mushroom, texShroom, shroomTransform[i]);
         }
-        mushroom.draw();
-        GL_CHECK_ERROR;
 
-        // HUD
-//        transformProgram.use();
-//        glDepthFunc(GL_ALWAYS);
-//        redSquare.draw(GL_TRIANGLES, 6);
-//        glDepthFunc(GL_LESS);
+        GL_CHECK_ERROR;
 
         // Update la fenetre
         w.swap();
