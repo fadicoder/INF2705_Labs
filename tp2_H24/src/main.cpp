@@ -267,9 +267,9 @@ int main(int argc, char *argv[]) {
         updateTransformation(w, camera, position, orientation, angleDeg, MATRIX_LOCATION);
 
         // HUD
-//        heartTex.use();
-//        redSquare.draw(GL_TRIANGLES, 6);
-//        Texture2D::unuse();
+        heartTex.use();
+        redSquare.draw(GL_TRIANGLES, 6);
+        Texture2D::unuse();
 
         // Sol
         groundTex.use();
