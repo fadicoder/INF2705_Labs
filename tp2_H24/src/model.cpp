@@ -2,6 +2,7 @@
 
 #include "obj_loader.h"
 #include "shapes.h"
+#include "utils.h"
 #include <iostream>
 
 Model::Model() : m_count(0){}

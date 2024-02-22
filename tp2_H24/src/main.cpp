@@ -175,6 +175,20 @@ int main(int argc, char *argv[]) {
         modelProgram.attachShader(fragShader);
         modelProgram.link();
     }
+
+    ShaderProgram waterProgram;
+    {
+        std::string str = readFile("shaders/water.fs.glsl");
+        std::string vstr = readFile("shaders/water.vs.glsl");
+
+        Shader fragShader(GL_FRAGMENT_SHADER, str.c_str());
+        Shader vertShader(GL_VERTEX_SHADER, vstr.c_str());
+
+        waterProgram.attachShader(vertShader);
+        waterProgram.attachShader(fragShader);
+        waterProgram.link();
+    }
+
     float angleDeg = 0.0f;
 
     // HUD
@@ -196,6 +210,9 @@ int main(int argc, char *argv[]) {
     river.enableAttribute(1, 2, sizeof(float) * 5, (sizeof(float) * 3));
     Texture2D riverTex("../textures/waterSeamless.jpg", GL_REPEAT);
     riverTex.enableMipmap();
+
+    const GLint MATRIX_LOCATION_WATER = waterProgram.getUniformLoc("mvp");
+    const GLint TIME_LOCATION = waterProgram.getUniformLoc("appTime");
     const GLint MATRIX_LOCATION = transformProgram.getUniformLoc("mvp");
 
     Model suzanne("../models/suzanne.obj");
@@ -262,7 +279,7 @@ int main(int argc, char *argv[]) {
 //        } else if (w.getMouseScrollDirection() == -1){
 //            view = camera.getThirdPersonViewMatrix();
 //        }
-        glm::mat4 view = camera.getFirstPersonViewMatrix();
+        glm::mat4 view = camera.getThirdPersonViewMatrix();
 
         // 2D elements
         // Mets la transformation de la caméra
@@ -284,13 +301,16 @@ int main(int argc, char *argv[]) {
         Texture2D::unuse();
 
         // Riviere
+        waterProgram.use();
+        glUniform1ui(TIME_LOCATION, w.getTick());
+        updateTransformation(w, view, angleDeg, MATRIX_LOCATION_WATER);
+
         riverTex.use();
         river.draw(GL_TRIANGLES, 6);
         Texture2D::unuse();
 
         // 3D elements
         modelProgram.use();
-        updateTransformation(w, view, angleDeg, MODEL_MATRIX_LOCATION);
 
         // Suzanne
         updateModelMatrix(w, view, suzanneTransform, MODEL_MATRIX_LOCATION);
