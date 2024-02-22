@@ -193,12 +193,14 @@ int main(int argc, char *argv[]) {
     ground.enableAttribute(0, 3, sizeof(float) * 5, 0);
     ground.enableAttribute(1, 2, sizeof(float) * 5, (sizeof(float) * 3));
     Texture2D groundTex("../textures/groundSeamless.jpg", GL_REPEAT);
+    groundTex.enableMipmap();
 
     BasicShapeElements river(riverVertices, sizeof(riverVertices), riverIndexes,
                              sizeof(riverIndexes));
     river.enableAttribute(0, 3, sizeof(float) * 5, 0);
     river.enableAttribute(1, 2, sizeof(float) * 5, (sizeof(float) * 3));
     Texture2D riverTex("../textures/waterSeamless.jpg", GL_REPEAT);
+    riverTex.enableMipmap();
     const GLint MATRIX_LOCATION = transformProgram.getUniformLoc("mvp");
 
     Model suzanne("../models/suzanne.obj");
