@@ -2,10 +2,10 @@
 #define VERTICES_DATA_H
 
 const GLfloat colorSquareVerticesReduced[] = {
-        -0.5f, -1.f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-        0.5f, -1.f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-        -0.5, 1.f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-        0.5f, 1.f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f
+        -0.5f, -1.f, 0.0f, 0.0f, 0.0f,
+        0.5f, -1.f, 0.0f, 1.0f, 0.0f,
+        -0.5, 1.f, 0.0f, 0.0f, 1.0f,
+        0.5f, 1.f, 0.0f, 1.0f, 1.0f,
 };
 
 const GLuint indexes[] = {
@@ -68,10 +68,10 @@ const GLuint cubeIndexes[] = {
 };
 
 const GLfloat groundVertices[] = {
-        -60.0f, -1.0f, -60.0f, -60.0f, -60.0f,
-        60.0f, -1.0f, -60.0f, -60.0f, -54.0f,
-        -60.0f, -1.0f, 60.0f, -54.0f, -54.0f,
-        60.0f, -1.0f, 60.0f, -54.0f, -60.0f,
+        -30.0f, -1.0f, -30.0f, 0.0f, 0.0f,
+        30.0f, -1.0f, -30.0f, 10.0f, 0.0f,
+        -30.0f, -1.0f, 30.0f, 0.0f, 10.0f,
+        30.0f, -1.0f, 30.0f, 10.0f, 10.0f,
 };
 
 const GLuint groundIndexes[] = {
@@ -81,10 +81,10 @@ const GLuint groundIndexes[] = {
 
 
 const GLfloat riverVertices[] = {
-        10.0f, -0.99f, -60.0f, 10.0f, 10.0f,
-        60.0f, -0.99f, -60.0f, 10.0f, 9.0f,
-        10.0f, -0.99f, 60.0f, 9.0f, 9.0f,
-        60.0f, -0.99f, 60.0f, 9.0f, 10.0f,
+        30.0f, -1.0f, -30.0f, 0.0f, 0.0f,
+        50.0f, -1.0f, -30.0f, 3.0f, 0.0f,
+        30.0f, -1.0f, 30.0f, 0.0f, 10.0f,
+        50.0f, -1.0f, 30.0f, 3.0f, 10.0f,
 };
 
 const GLuint riverIndexes[] = {

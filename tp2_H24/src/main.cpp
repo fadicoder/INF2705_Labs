@@ -34,7 +34,7 @@ void updateTransformation(Window &w, Camera &camera, float &angleDeg, const GLin
     // Utiliser glm pour les calculs de matrices.
     glm::mat4 model = glm::rotate(glm::mat4(1.0f), glm::radians(angleDeg), glm::vec3(0.1f, 1.0f, 0.1f));
 
-    glm::mat4 view = camera.getFirstPersonViewMatrix();
+    glm::mat4 view = camera.getThirdPersonViewMatrix();
 
     glm::mat4 projection = glm::perspective(70.0f, (float) (w.getWidth() / w.getHeight()), 0.1f, 200.0f);
 
@@ -47,7 +47,7 @@ void updateModelMatrix(Window &w, Camera &camera, glm::mat4 &model, const GLint 
     // Calcul des matrices et envoyer une matrice résultante mvp au shader.
     // Utiliser glm pour les calculs de matrices.
 
-    glm::mat4 view = camera.getFirstPersonViewMatrix();
+    glm::mat4 view = camera.getThirdPersonViewMatrix();
 
     glm::mat4 projection = glm::perspective(70.0f, (float) (w.getWidth() / w.getHeight()), 0.1f, 200.0f);
 
@@ -183,8 +183,8 @@ int main(int argc, char *argv[]) {
 
     // HUD
     BasicShapeElements redSquare(colorSquareVerticesReduced, sizeof(colorSquareVerticesReduced), indexes, sizeof(indexes));
-    redSquare.enableAttribute(0, 3, sizeof(float)*7, 0);
-    redSquare.enableAttribute(1, 4, sizeof(float)*7, (sizeof(float)*3));
+    redSquare.enableAttribute(0, 3, sizeof(float)*5, 0);
+    redSquare.enableAttribute(1, 2, sizeof(float)*5, (sizeof(float)*3));
     Texture2D heartTex("../textures/heart.png", GL_CLAMP_TO_BORDER);
 
     BasicShapeElements ground(groundVertices, sizeof(groundVertices), groundIndexes,
@@ -227,7 +227,7 @@ int main(int argc, char *argv[]) {
     glm::mat4 shroomTransform[N_GROUPS];
     for (int i = 0; i < N_GROUPS; i++) {
         float x, z;
-        getGroupRandomPos(i, 1, x, z);
+        getGroupRandomPos(i, N_ROWS, x, z);
         glm::vec3 randomPos = glm::vec3(x, -1.0f, z);
         groupsTransform[i] = getRandomScale(getRandomRotation(glm::translate(glm::mat4(1.0f), randomPos)));
         treeTransform[i] = getRandomScale(getRandomRotation(glm::translate(glm::mat4(1.0f), randomPos)));
