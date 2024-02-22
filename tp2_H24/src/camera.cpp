@@ -14,8 +14,10 @@ glm::mat4 Camera::getFirstPersonViewMatrix() {
     // Calcul et retour de la matrice de vue en première personne
     // à partir des attributs de la classe
     glm::mat4 view = glm::rotate(glm::mat4(1.0f), -m_orientation.x, glm::vec3(1, 0, 0));
-    view = glm::rotate(view, -m_orientation.y, glm::vec3(0, 1, 0));
-    view = glm::translate(view, -m_position);
+    view = glm::rotate(view, m_orientation.y, glm::vec3(0, 1, 0));
+    std::cout << "x: " << m_position.x << " y: " << m_position.y << " z: " << m_position.z << std::endl;
+    view = glm::translate(view, glm::vec3(-m_position.z, 0, m_position.x)); // j'ai aucune idee pourquoi il faut transposer le vecteur de position
+    // view = glm::translate(view, glm::vec3(0.0f, -1.0f, 0.0f));
     return view;
 }
 

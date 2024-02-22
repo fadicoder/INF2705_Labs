@@ -29,13 +29,12 @@ void resizeWindowOnChange(Window &w) {
         glViewport(0, 0, w.getWidth(), w.getHeight());
 }
 
-void updateTransformation(Window &w, Camera &camera, glm::vec3 &position, glm::vec2 &orientation, float &angleDeg,
-                          const GLint MATRIX_LOCATION) {
+void updateTransformation(Window &w, Camera &camera, float &angleDeg, const GLint MATRIX_LOCATION) {
     // Calcul des matrices et envoyer une matrice résultante mvp au shader.
     // Utiliser glm pour les calculs de matrices.
     glm::mat4 model = glm::rotate(glm::mat4(1.0f), glm::radians(angleDeg), glm::vec3(0.1f, 1.0f, 0.1f));
 
-    glm::mat4 view = camera.getThirdPersonViewMatrix();
+    glm::mat4 view = camera.getFirstPersonViewMatrix();
 
     glm::mat4 projection = glm::perspective(70.0f, (float) (w.getWidth() / w.getHeight()), 0.1f, 200.0f);
 
@@ -48,7 +47,7 @@ void updateModelMatrix(Window &w, Camera &camera, glm::mat4 &model, const GLint 
     // Calcul des matrices et envoyer une matrice résultante mvp au shader.
     // Utiliser glm pour les calculs de matrices.
 
-    glm::mat4 view = camera.getThirdPersonViewMatrix();
+    glm::mat4 view = camera.getFirstPersonViewMatrix();
 
     glm::mat4 projection = glm::perspective(70.0f, (float) (w.getWidth() / w.getHeight()), 0.1f, 200.0f);
 
@@ -266,7 +265,7 @@ int main(int argc, char *argv[]) {
         // 2D elements
         // Mets la transformation de la caméra
         transformProgram.use();
-        updateTransformation(w, camera, position, orientation, angleDeg, MATRIX_LOCATION);
+        updateTransformation(w, camera, angleDeg, MATRIX_LOCATION);
 
         // HUD
         heartTex.use();
@@ -285,7 +284,7 @@ int main(int argc, char *argv[]) {
 
         // 3D elements
         modelProgram.use();
-        updateTransformation(w, camera, position, orientation, angleDeg, MODEL_MATRIX_LOCATION);
+        updateTransformation(w, camera, angleDeg, MODEL_MATRIX_LOCATION);
 
         // Suzanne
         updateModelMatrix(w, camera, suzanneTransform, MODEL_MATRIX_LOCATION);
