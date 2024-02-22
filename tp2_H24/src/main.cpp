@@ -112,10 +112,11 @@ glm::mat4 getRandomScale(glm::mat4 transform) {
 glm::mat4 getRandomRotation(glm::mat4 transform) {
     std::uniform_real_distribution<> rnd(0, 2 * M_PI);
     float rot = rnd(gen);
-    return glm::rotate(transform, rot, glm::vec3(0.f,1.f,0.f));
+    return glm::rotate(transform, rot, glm::vec3(0.f, 1.f, 0.f));
 }
 
-void drawSingleModel(Window &w, glm::mat4 &view, Model& model, Texture2D& tex, glm::mat4& transform, const GLint MATRIX_LOCATION){
+void drawSingleModel(Window &w, glm::mat4 &view, Model &model, Texture2D &tex, glm::mat4 &transform,
+                     const GLint MATRIX_LOCATION) {
     updateModelMatrix(w, view, transform, MATRIX_LOCATION);
     tex.use();
     model.draw();
@@ -126,9 +127,9 @@ void drawGroup(
         Window &w,
         glm::mat4 &view,
         const GLint MATRIX_LOCATION,
-        Model &tree, Texture2D& treeTex, glm::mat4 &treeTransform,
-        Model &rock, Texture2D& rockTex, glm::mat4 &rockTransform,
-        Model &mushroom,  Texture2D& shroomTex, glm::mat4 &shroomTransform) {
+        Model &tree, Texture2D &treeTex, glm::mat4 &treeTransform,
+        Model &rock, Texture2D &rockTex, glm::mat4 &rockTransform,
+        Model &mushroom, Texture2D &shroomTex, glm::mat4 &shroomTransform) {
     drawSingleModel(w, view, tree, treeTex, treeTransform, MATRIX_LOCATION);
     drawSingleModel(w, view, rock, rockTex, rockTransform, MATRIX_LOCATION);
     drawSingleModel(w, view, mushroom, shroomTex, shroomTransform, MATRIX_LOCATION);
