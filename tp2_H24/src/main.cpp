@@ -168,7 +168,9 @@ int main(int argc, char *argv[]) {
     // Model program
     auto modelProgram = setupShaderProgram("shaders/model.fs.glsl", "shaders/model.vs.glsl");
     // Skybox program
-    // auto skyboxProgram = setupShaderProgram("shaders/skybox.fs.glsl", "shaders/skybox.vs.glsl");
+    auto skyboxProgram = setupShaderProgram("shaders/skybox.fs.glsl", "shaders/skybox.vs.glsl");
+
+    // Water program
     auto waterProgram = setupShaderProgram("shaders/water.fs.glsl", "shaders/water.vs.glsl");
 
     // HUD
@@ -195,6 +197,19 @@ int main(int argc, char *argv[]) {
     const GLint MATRIX_LOCATION_WATER = waterProgram.getUniformLoc("mvp");
     const GLint TIME_LOCATION = waterProgram.getUniformLoc("appTime");
     const GLint MATRIX_LOCATION = transformProgram.getUniformLoc("mvp");
+
+    BasicShapeArrays skybox(skyboxVertices, sizeof(skyboxVertices));
+    skybox.enableAttribute(0, 3, sizeof(float) * 5, 0);
+    skybox.enableAttribute(1, 2, sizeof(float) * 5, (sizeof(float) * 3));
+    const char *pathes[] = {"../textures/skybox/Daylight Box_Back.bmp",
+                            "../textures/skybox/Daylight Box_Bottom.bmp",
+                            "../textures/skybox/Daylight Box_Front.bmp",
+                            "../textures/skybox/Daylight Box_Left.bmp",
+                            "../textures/skybox/Daylight Box_Right.bmp",
+                            "../textures/skybox/Daylight Box_Top.bmp"};
+    TextureCubeMap skyboxTex(pathes);
+    const GLint SKYBOX_MATRIX_LOCATION = skyboxProgram.getUniformLoc("mvp");
+    GL_CHECK_ERROR;
 
     Model suzanne("../models/suzanne.obj");
     glm::vec3 position = glm::vec3(0, 1, 0);
@@ -310,6 +325,12 @@ int main(int argc, char *argv[]) {
             drawGroup(w, view, MODEL_MATRIX_LOCATION, tree, texTree, treeTransform[i], rock, texRock, rockTransform[i],
                       mushroom, texShroom, shroomTransform[i]);
         }
+
+        GL_CHECK_ERROR;
+        // SkyBox
+        skyboxTex.use();
+        GL_CHECK_ERROR;
+        skybox.draw(GL_TRIANGLES, 36);
 
         GL_CHECK_ERROR;
 
