@@ -109,7 +109,6 @@ glm::mat4 getRandomScale(glm::mat4 transform) {
 }
 
 
-
 glm::mat4 getRandomRotation(glm::mat4 transform) {
     std::uniform_real_distribution<> rnd(0, 2 * M_PI);
     float rot = rnd(gen);
@@ -135,6 +134,20 @@ void drawGroup(
     drawSingleModel(w, view, mushroom, shroomTex, shroomTransform, MATRIX_LOCATION);
 }
 
+ShaderProgram setupShaderProgram(const char *fragmentShader, const char *vertexShader) {
+    ShaderProgram program;
+    std::string str = readFile(fragmentShader);
+    std::string vstr = readFile(vertexShader);
+
+    Shader fragShader(GL_FRAGMENT_SHADER, str.c_str());
+    Shader vertShader(GL_VERTEX_SHADER, vstr.c_str());
+
+    program.attachShader(vertShader);
+    program.attachShader(fragShader);
+    program.link();
+    return program;
+}
+
 int main(int argc, char *argv[]) {
     Window w;
     if (!w.init())
@@ -148,39 +161,22 @@ int main(int argc, char *argv[]) {
 
     printGLInfo();
 
-    // Transform program
-    ShaderProgram transformProgram;
-    {
-        std::string str = readFile("shaders/transform.fs.glsl");
-        std::string vstr = readFile("shaders/transform.vs.glsl");
-
-        Shader fragShader(GL_FRAGMENT_SHADER, str.c_str());
-        Shader vertShader(GL_VERTEX_SHADER, vstr.c_str());
-
-        transformProgram.attachShader(vertShader);
-        transformProgram.attachShader(fragShader);
-        transformProgram.link();
-    }
-
-    // Transform program
-    ShaderProgram modelProgram;
-    {
-        std::string str = readFile("shaders/model.fs.glsl");
-        std::string vstr = readFile("shaders/model.vs.glsl");
-
-        Shader fragShader(GL_FRAGMENT_SHADER, str.c_str());
-        Shader vertShader(GL_VERTEX_SHADER, vstr.c_str());
-
-        modelProgram.attachShader(vertShader);
-        modelProgram.attachShader(fragShader);
-        modelProgram.link();
-    }
     float angleDeg = 0.0f;
 
+    // Transform program
+    auto transformProgram = setupShaderProgram("shaders/transform.fs.glsl", "shaders/transform.vs.glsl");
+
+    // Model program
+    auto modelProgram = setupShaderProgram("shaders/model.fs.glsl", "shaders/model.vs.glsl");
+
+    // Skybox program
+    auto skyboxProgram = setupShaderProgram("shaders/skybox.fs.glsl", "shaders/skybox.vs.glsl");
+
     // HUD
-    BasicShapeElements redSquare(colorSquareVerticesReduced, sizeof(colorSquareVerticesReduced), indexes, sizeof(indexes));
-    redSquare.enableAttribute(0, 3, sizeof(float)*5, 0);
-    redSquare.enableAttribute(1, 2, sizeof(float)*5, (sizeof(float)*3));
+    BasicShapeElements redSquare(colorSquareVerticesReduced, sizeof(colorSquareVerticesReduced), indexes,
+                                 sizeof(indexes));
+    redSquare.enableAttribute(0, 3, sizeof(float) * 5, 0);
+    redSquare.enableAttribute(1, 2, sizeof(float) * 5, (sizeof(float) * 3));
     Texture2D heartTex("../textures/heart.png", GL_CLAMP_TO_BORDER);
 
     BasicShapeElements ground(groundVertices, sizeof(groundVertices), groundIndexes,
