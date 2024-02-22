@@ -29,12 +29,10 @@ void resizeWindowOnChange(Window &w) {
         glViewport(0, 0, w.getWidth(), w.getHeight());
 }
 
-void updateTransformation(Window &w, Camera &camera, float &angleDeg, const GLint MATRIX_LOCATION) {
+void updateTransformation(Window &w, glm::mat4 &view, float &angleDeg, const GLint MATRIX_LOCATION) {
     // Calcul des matrices et envoyer une matrice résultante mvp au shader.
     // Utiliser glm pour les calculs de matrices.
     glm::mat4 model = glm::rotate(glm::mat4(1.0f), glm::radians(angleDeg), glm::vec3(0.1f, 1.0f, 0.1f));
-
-    glm::mat4 view = camera.getThirdPersonViewMatrix();
 
     glm::mat4 projection = glm::perspective(70.0f, (float) (w.getWidth() / w.getHeight()), 0.1f, 200.0f);
 
@@ -43,11 +41,9 @@ void updateTransformation(Window &w, Camera &camera, float &angleDeg, const GLin
     glUniformMatrix4fv(MATRIX_LOCATION, 1.0f, GL_FALSE, (GLfloat *) &transformation);
 }
 
-void updateModelMatrix(Window &w, Camera &camera, glm::mat4 &model, const GLint MATRIX_LOCATION) {
+void updateModelMatrix(Window &w, glm::mat4 &view, glm::mat4 &model, const GLint MATRIX_LOCATION) {
     // Calcul des matrices et envoyer une matrice résultante mvp au shader.
     // Utiliser glm pour les calculs de matrices.
-
-    glm::mat4 view = camera.getThirdPersonViewMatrix();
 
     glm::mat4 projection = glm::perspective(70.0f, (float) (w.getWidth() / w.getHeight()), 0.1f, 200.0f);
 
@@ -120,8 +116,8 @@ glm::mat4 getRandomRotation(glm::mat4 transform) {
     return glm::rotate(transform, rot, glm::vec3(0.f,1.f,0.f));
 }
 
-void drawSingleModel(Window &w, Camera &camera, Model& model, Texture2D& tex, glm::mat4& transform, const GLint MATRIX_LOCATION){
-    updateModelMatrix(w, camera, transform, MATRIX_LOCATION);
+void drawSingleModel(Window &w, glm::mat4 &view, Model& model, Texture2D& tex, glm::mat4& transform, const GLint MATRIX_LOCATION){
+    updateModelMatrix(w, view, transform, MATRIX_LOCATION);
     tex.use();
     model.draw();
     Texture2D::unuse();
@@ -129,14 +125,14 @@ void drawSingleModel(Window &w, Camera &camera, Model& model, Texture2D& tex, gl
 
 void drawGroup(
         Window &w,
-        Camera &camera,
+        glm::mat4 &view,
         const GLint MATRIX_LOCATION,
         Model &tree, Texture2D& treeTex, glm::mat4 &treeTransform,
         Model &rock, Texture2D& rockTex, glm::mat4 &rockTransform,
         Model &mushroom,  Texture2D& shroomTex, glm::mat4 &shroomTransform) {
-    drawSingleModel(w, camera, tree, treeTex, treeTransform, MATRIX_LOCATION);
-    drawSingleModel(w, camera, rock, rockTex, rockTransform, MATRIX_LOCATION);
-    drawSingleModel(w, camera, mushroom, shroomTex, shroomTransform, MATRIX_LOCATION);
+    drawSingleModel(w, view, tree, treeTex, treeTransform, MATRIX_LOCATION);
+    drawSingleModel(w, view, rock, rockTex, rockTransform, MATRIX_LOCATION);
+    drawSingleModel(w, view, mushroom, shroomTex, shroomTransform, MATRIX_LOCATION);
 }
 
 int main(int argc, char *argv[]) {
@@ -261,16 +257,26 @@ int main(int argc, char *argv[]) {
 
         move(w, position, orientation);
         look(w, orientation);
+//        if (w.getMouseScrollDirection() == 1){
+//            view = camera.getFirstPersonViewMatrix();
+//        } else if (w.getMouseScrollDirection() == -1){
+//            view = camera.getThirdPersonViewMatrix();
+//        }
+        glm::mat4 view = camera.getFirstPersonViewMatrix();
 
         // 2D elements
         // Mets la transformation de la caméra
         transformProgram.use();
-        updateTransformation(w, camera, angleDeg, MATRIX_LOCATION);
 
         // HUD
         heartTex.use();
+        auto hudview = glm::mat4(1.0f);
+        hudview = glm::translate(hudview, glm::vec3{-0.8, -0.8, 0});
+        glUniformMatrix4fv(MATRIX_LOCATION, 1.0f, GL_FALSE, (GLfloat *) &hudview);
         redSquare.draw(GL_TRIANGLES, 6);
         Texture2D::unuse();
+
+        updateTransformation(w, view, angleDeg, MATRIX_LOCATION);
 
         // Sol
         groundTex.use();
@@ -284,17 +290,17 @@ int main(int argc, char *argv[]) {
 
         // 3D elements
         modelProgram.use();
-        updateTransformation(w, camera, angleDeg, MODEL_MATRIX_LOCATION);
+        updateTransformation(w, view, angleDeg, MODEL_MATRIX_LOCATION);
 
         // Suzanne
-        updateModelMatrix(w, camera, suzanneTransform, MODEL_MATRIX_LOCATION);
+        updateModelMatrix(w, view, suzanneTransform, MODEL_MATRIX_LOCATION);
         texSuzanne.use();
         suzanne.draw();
         Texture2D::unuse();
 
         // Vegetation
         for (int i = 0; i < N_GROUPS; ++i) {
-            drawGroup(w, camera, MODEL_MATRIX_LOCATION, tree, texTree, treeTransform[i], rock, texRock, rockTransform[i],
+            drawGroup(w, view, MODEL_MATRIX_LOCATION, tree, texTree, treeTransform[i], rock, texRock, rockTransform[i],
                       mushroom, texShroom, shroomTransform[i]);
         }
 
