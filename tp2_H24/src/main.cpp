@@ -239,6 +239,9 @@ int main(int argc, char *argv[]) {
     }
 
     Camera camera(position, orientation);
+    glm::mat4 view = camera.getFirstPersonViewMatrix();
+    bool firstPersonView = true;
+    int nextView = 0;
 
     // Partie 1: Donner une couleur de remplissage aux fonds.
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -255,12 +258,13 @@ int main(int argc, char *argv[]) {
 
         move(w, position, orientation);
         look(w, orientation);
-//        if (w.getMouseScrollDirection() == 1){
-//            view = camera.getFirstPersonViewMatrix();
-//        } else if (w.getMouseScrollDirection() == -1){
-//            view = camera.getThirdPersonViewMatrix();
-//        }
-        glm::mat4 view = camera.getThirdPersonViewMatrix();
+        nextView = w.getMouseScrollDirection();
+        firstPersonView = nextView == 0 ? firstPersonView : fmax(nextView, 0) == 1;
+        if (firstPersonView)
+            view = camera.getFirstPersonViewMatrix();
+        else
+            view = camera.getThirdPersonViewMatrix();
+
 
         // 2D elements
         // Mets la transformation de la caméra
@@ -294,10 +298,12 @@ int main(int argc, char *argv[]) {
         modelProgram.use();
 
         // Suzanne
-        updateModelMatrix(w, view, suzanneTransform, MODEL_MATRIX_LOCATION);
-        texSuzanne.use();
-        suzanne.draw();
-        Texture2D::unuse();
+        if (!firstPersonView) {
+            updateModelMatrix(w, view, suzanneTransform, MODEL_MATRIX_LOCATION);
+            texSuzanne.use();
+            suzanne.draw();
+            Texture2D::unuse();
+        }
 
         // Vegetation
         for (int i = 0; i < N_GROUPS; ++i) {
