@@ -199,8 +199,7 @@ int main(int argc, char *argv[]) {
     const GLint MATRIX_LOCATION = transformProgram.getUniformLoc("mvp");
 
     BasicShapeArrays skybox(skyboxVertices, sizeof(skyboxVertices));
-    skybox.enableAttribute(0, 3, sizeof(float) * 5, 0);
-    skybox.enableAttribute(1, 2, sizeof(float) * 5, (sizeof(float) * 3));
+    skybox.enableAttribute(0, 3, 0, 0);
     const char *pathes[] = {"../textures/skybox/Daylight Box_Back.bmp",
                             "../textures/skybox/Daylight Box_Bottom.bmp",
                             "../textures/skybox/Daylight Box_Front.bmp",
@@ -328,6 +327,7 @@ int main(int argc, char *argv[]) {
 
         GL_CHECK_ERROR;
         // SkyBox
+        updateTransformation(w, view, angleDeg, SKYBOX_MATRIX_LOCATION);
         skyboxTex.use();
         GL_CHECK_ERROR;
         skybox.draw(GL_TRIANGLES, 36);
