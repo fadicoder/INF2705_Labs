@@ -175,8 +175,6 @@ int main(int argc, char *argv[]) {
     printGLInfo();
     float angleDeg = 0.0f;
 
-    // Transform program
-    auto transformProgram = setupShaderProgram("shaders/transform.fs.glsl", "shaders/transform.vs.glsl");
     // Model program
     auto modelProgram = setupShaderProgram("shaders/model.fs.glsl", "shaders/model.vs.glsl");
     // Skybox program
@@ -207,7 +205,6 @@ int main(int argc, char *argv[]) {
 
     const GLint MATRIX_LOCATION_WATER = waterProgram.getUniformLoc("mvp");
     const GLint TIME_LOCATION = waterProgram.getUniformLoc("appTime");
-    const GLint MATRIX_LOCATION = transformProgram.getUniformLoc("mvp");
 
     BasicShapeArrays skybox(skyboxVertices, sizeof(skyboxVertices));
     skybox.enableAttribute(0, 3, 0, 0);
@@ -297,34 +294,23 @@ int main(int argc, char *argv[]) {
 
         // 2D elements
         // Mets la transformation de la caméra
-        transformProgram.use();
+        modelProgram.use();
 
         // HUD
         heartTex.use();
-        auto hudview = glm::mat4(1.0f);
-        hudview = glm::translate(hudview, glm::vec3{-0.8, -0.8, 0});
-        glUniformMatrix4fv(MATRIX_LOCATION, 1.0f, GL_FALSE, (GLfloat *) &hudview);
+        glm::mat4 hudTransform = glm::translate(glm::mat4(1.0f), glm::vec3{-0.8, -0.8, 0});
+        glUniformMatrix4fv(MODEL_MATRIX_LOCATION, 1.0f, GL_FALSE, (GLfloat *) &hudTransform);
         redSquare.draw(GL_TRIANGLES, 6);
         Texture2D::unuse();
 
-        updateTransformation(w, view, angleDeg, MATRIX_LOCATION);
+        updateTransformation(w, view, angleDeg, MODEL_MATRIX_LOCATION);
 
         // Sol
         groundTex.use();
         ground.draw(GL_TRIANGLES, 6);
         Texture2D::unuse();
 
-        // Riviere
-        waterProgram.use();
-        glUniform1ui(TIME_LOCATION, w.getTick());
-        updateTransformation(w, view, angleDeg, MATRIX_LOCATION_WATER);
-
-        riverTex.use();
-        river.draw(GL_TRIANGLES, 6);
-        Texture2D::unuse();
-
         // 3D elements
-        modelProgram.use();
 
         // Suzanne
         if (!firstPersonView) {
@@ -339,6 +325,15 @@ int main(int argc, char *argv[]) {
             drawGroup(w, view, MODEL_MATRIX_LOCATION, tree, texTree, treeTransform[i], rock, texRock, rockTransform[i],
                       mushroom, texShroom, shroomTransform[i]);
         }
+
+        // Riviere
+        waterProgram.use();
+        glUniform1ui(TIME_LOCATION, w.getTick());
+        updateTransformation(w, view, angleDeg, MATRIX_LOCATION_WATER);
+
+        riverTex.use();
+        river.draw(GL_TRIANGLES, 6);
+        Texture2D::unuse();
 
         GL_CHECK_ERROR;
         // SkyBox
