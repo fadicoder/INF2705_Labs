@@ -52,7 +52,6 @@ void Texture2D::enableMipmap() {
 
 void Texture2D::use() {
     // Utilise la texture
-    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, this->m_id);
 }
 
@@ -76,16 +75,18 @@ TextureCubeMap::TextureCubeMap(const char **pathes) {
     }
 
     // TODO: Chargement des textures du cubemap.
-    glGenTextures(6, &this->m_id);
-    for (int i = 0; i < 6; ++i) {
-        glActiveTexture(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, this->m_id);
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA, widths[i], heights[i], 0, GL_RGB, GL_UNSIGNED_BYTE, datas[i]);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-        glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glGenTextures(1, &this->m_id);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, this->m_id);
+
+    for (int i = 0; i < 6; i++) {
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, widths[i], heights[i], 0, GL_RGB, GL_UNSIGNED_BYTE, datas[i]);
     }
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
     for (auto& data : datas) {
         stbi_image_free(data);
@@ -94,13 +95,10 @@ TextureCubeMap::TextureCubeMap(const char **pathes) {
 
 TextureCubeMap::~TextureCubeMap() {
     // TODO: Supprimer la mémoire de l'objet
-    glDeleteTextures(6, &this->m_id);
+    glDeleteTextures(1, &this->m_id);
 }
 
 void TextureCubeMap::use() {
     // TODO: Utilise la texture du cubemap
-    for (int i = 0; i < 6; ++i) {
-        glActiveTexture(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i);
-    }
     glBindTexture(GL_TEXTURE_CUBE_MAP, this->m_id);
 }

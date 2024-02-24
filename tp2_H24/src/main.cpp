@@ -41,6 +41,18 @@ void updateTransformation(Window &w, glm::mat4 &view, float &angleDeg, const GLi
     glUniformMatrix4fv(MATRIX_LOCATION, 1.0f, GL_FALSE, (GLfloat *) &transformation);
 }
 
+void updateSkyTransformation(Window &w, glm::mat4 &view, const GLint MATRIX_LOCATION) {
+    // Calcul des matrices et envoyer une matrice résultante mvp au shader.
+    // Utiliser glm pour les calculs de matrices.
+
+    // glm::mat4 projection = glm::frustum(-0.5f, 0.5f, -0.5f, 0.5f, -1.0f, 1.0f);00
+    // glm::mat4 projection = glm::frustum(-1.0f, 1.0f, 1.0f, -1.0f, -0.5f, 1.0f);
+    glm::mat4 projection = glm::perspective(70.0f, (float) (w.getWidth() / w.getHeight()), 0.1f, 200.0f);
+    glm::mat4 transformation = projection * glm::mat4(glm::mat3(view));
+
+    glUniformMatrix4fv(MATRIX_LOCATION, 1.0f, GL_FALSE, (GLfloat *) &transformation);
+}
+
 void updateModelMatrix(Window &w, glm::mat4 &view, glm::mat4 &model, const GLint MATRIX_LOCATION) {
     // Calcul des matrices et envoyer une matrice résultante mvp au shader.
     // Utiliser glm pour les calculs de matrices.
@@ -169,7 +181,6 @@ int main(int argc, char *argv[]) {
     auto modelProgram = setupShaderProgram("shaders/model.fs.glsl", "shaders/model.vs.glsl");
     // Skybox program
     auto skyboxProgram = setupShaderProgram("shaders/skybox.fs.glsl", "shaders/skybox.vs.glsl");
-
     // Water program
     auto waterProgram = setupShaderProgram("shaders/water.fs.glsl", "shaders/water.vs.glsl");
 
@@ -200,14 +211,18 @@ int main(int argc, char *argv[]) {
 
     BasicShapeArrays skybox(skyboxVertices, sizeof(skyboxVertices));
     skybox.enableAttribute(0, 3, 0, 0);
-    const char *pathes[] = {"../textures/skybox/Daylight Box_Back.bmp",
+    const char *pathes[] = {"../textures/skybox/Daylight Box_Right.bmp",
+                            "../textures/skybox/Daylight Box_Left.bmp",
+                            "../textures/skybox/Daylight Box_Top.bmp",
                             "../textures/skybox/Daylight Box_Bottom.bmp",
                             "../textures/skybox/Daylight Box_Front.bmp",
-                            "../textures/skybox/Daylight Box_Left.bmp",
-                            "../textures/skybox/Daylight Box_Right.bmp",
-                            "../textures/skybox/Daylight Box_Top.bmp"};
+                            "../textures/skybox/Daylight Box_Back.bmp"
+    };
     TextureCubeMap skyboxTex(pathes);
     const GLint SKYBOX_MATRIX_LOCATION = skyboxProgram.getUniformLoc("mvp");
+    const GLint SKY_TEX_UNIT_LOCATION = modelProgram.getUniformLoc("texSampler");
+    glUniform1i(SKY_TEX_UNIT_LOCATION, 0);
+    skyboxTex.use();
     GL_CHECK_ERROR;
 
     Model suzanne("../models/suzanne.obj");
@@ -327,10 +342,12 @@ int main(int argc, char *argv[]) {
 
         GL_CHECK_ERROR;
         // SkyBox
-        updateTransformation(w, view, angleDeg, SKYBOX_MATRIX_LOCATION);
+        glDepthFunc(GL_EQUAL);
+        skyboxProgram.use();
+        updateSkyTransformation(w, view, SKYBOX_MATRIX_LOCATION);
         skyboxTex.use();
-        GL_CHECK_ERROR;
         skybox.draw(GL_TRIANGLES, 36);
+        glDepthFunc(GL_LESS);
 
         GL_CHECK_ERROR;
 
