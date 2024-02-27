@@ -65,8 +65,8 @@ void updateModelMatrix(Window &w, glm::mat4 &view, glm::mat4 &model, const GLint
 }
 
 void move(Window &w, glm::vec3 &position, glm::vec2 &orientation) {
-    const glm::vec3 orientationVector = glm::vec3(-glm::sin(orientation.y), 0, glm::cos(orientation.y));
-    const glm::vec3 perpendicularVector = glm::vec3(-orientationVector.z, 0, orientationVector.x);
+    const glm::vec3 orientationVector = glm::vec3(-glm::sin(orientation.y), 0, glm::cos(orientation.y)) * 0.40f;
+    const glm::vec3 perpendicularVector = glm::vec3(-orientationVector.z, 0, orientationVector.x) * 0.25f;
     if (w.getKeyHold(Window::Key::W)) {
         position += orientationVector;
     } else if (w.getKeyHold(Window::Key::S)) {
@@ -225,7 +225,7 @@ int main(int argc, char *argv[]) {
     Model suzanne("../models/suzanne.obj");
     glm::vec3 position = glm::vec3(0, 1, 0);
     glm::vec2 orientation = glm::vec2(0, 0);
-    auto suzanneTransform = glm::mat4(1.0f);
+    auto suzanneTransform = glm::mat4(-1.0f);
     const GLint MODEL_MATRIX_LOCATION = modelProgram.getUniformLoc("mvp");
 
     Texture2D texSuzanne("../models/suzanneTexture.png", GL_CLAMP_TO_EDGE);
@@ -313,7 +313,21 @@ int main(int argc, char *argv[]) {
         // 3D elements
 
         // Suzanne
-        suzanneTransform = getConstantScale(glm::translate(glm::rotate(glm::mat4(1.0f), angleDeg, {orientation.x, orientation.y, 0}), {-position.x, -1, -position.z}), 0.6f);
+        suzanneTransform = getConstantScale( // Then scale
+                glm::translate(     // Then translate
+                        glm::rotate(      // Rotate
+//                                glm::rotate(
+//                                        glm::mat4(1.0f),
+//                                        (float) M_PI,
+//                                        {0, 1, 0}
+//                                ),
+                                glm::mat4(1.0f),
+                                -orientation.y,
+                                {0, -1, 0}
+                        ),
+                        {-position.x, -1, -position.z}),
+                0.6f
+        );
         updateModelMatrix(w, view, suzanneTransform, MODEL_MATRIX_LOCATION);
         if (!firstPersonView) {
             texSuzanne.use();
