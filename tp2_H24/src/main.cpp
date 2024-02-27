@@ -313,21 +313,17 @@ int main(int argc, char *argv[]) {
         // 3D elements
 
         // Suzanne
-        suzanneTransform = getConstantScale( // Then scale
-                glm::translate(     // Then translate
-                        glm::rotate(      // Rotate
-//                                glm::rotate(
+        // glm::rotate(
 //                                        glm::mat4(1.0f),
 //                                        (float) M_PI,
 //                                        {0, 1, 0}
 //                                ),
-                                glm::mat4(1.0f),
-                                -orientation.y,
-                                {0, -1, 0}
-                        ),
-                        {-position.x, -1, -position.z}),
-                0.6f
-        );
+        suzanneTransform = glm::mat4(1.0f);
+
+
+        suzanneTransform = glm::translate(suzanneTransform, {position.x, -1, position.z});
+        suzanneTransform = glm::rotate(suzanneTransform,-orientation.y,{0, 1, 0});
+        suzanneTransform = getConstantScale(suzanneTransform,0.6f);
         updateModelMatrix(w, view, suzanneTransform, MODEL_MATRIX_LOCATION);
         if (!firstPersonView) {
             texSuzanne.use();
