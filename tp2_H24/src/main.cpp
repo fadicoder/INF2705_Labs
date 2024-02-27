@@ -65,8 +65,8 @@ void updateModelMatrix(Window &w, glm::mat4 &view, glm::mat4 &model, const GLint
 }
 
 void move(Window &w, glm::vec3 &position, glm::vec2 &orientation) {
-    const glm::vec3 orientationVector = glm::vec3(glm::cos(orientation.y), 0, glm::sin(orientation.y));
-    const glm::vec3 perpendicularVector = glm::vec3(-glm::sin(orientation.y), 0, glm::cos(orientation.y));
+    const glm::vec3 orientationVector = glm::vec3(-glm::sin(orientation.y), 0, glm::cos(orientation.y));
+    const glm::vec3 perpendicularVector = glm::vec3(-orientationVector.z, 0, orientationVector.x);
     if (w.getKeyHold(Window::Key::W)) {
         position += orientationVector;
     } else if (w.getKeyHold(Window::Key::S)) {
