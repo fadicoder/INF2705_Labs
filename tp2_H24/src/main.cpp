@@ -69,11 +69,14 @@ void move(Window &w, glm::vec3 &position, glm::vec2 &orientation) {
     const glm::vec3 perpendicularVector = glm::vec3(-orientationVector.z, 0, orientationVector.x) * 0.25f;
     if (w.getKeyHold(Window::Key::W)) {
         position += orientationVector;
-    } else if (w.getKeyHold(Window::Key::S)) {
+    }
+    if (w.getKeyHold(Window::Key::S)) {
         position -= orientationVector;
-    } else if (w.getKeyHold(Window::Key::A)) {
+    }
+    if (w.getKeyHold(Window::Key::A)) {
         position -= perpendicularVector;
-    } else if (w.getKeyHold(Window::Key::D)) {
+    }
+    if (w.getKeyHold(Window::Key::D)) {
         position += perpendicularVector;
     }
 }
@@ -307,14 +310,7 @@ int main(int argc, char *argv[]) {
         // 3D elements
 
         // Suzanne
-        // glm::rotate(
-//                                        glm::mat4(1.0f),
-//                                        (float) M_PI,
-//                                        {0, 1, 0}
-//                                ),
         suzanneTransform = glm::mat4(1.0f);
-
-
         suzanneTransform = glm::translate(suzanneTransform, {position.x, -1, position.z});
         suzanneTransform = glm::rotate(suzanneTransform,-orientation.y,{0, 1, 0});
         suzanneTransform = getConstantScale(suzanneTransform,0.6f);
