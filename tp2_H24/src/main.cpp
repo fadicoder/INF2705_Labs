@@ -225,7 +225,7 @@ int main(int argc, char *argv[]) {
     Model suzanne("../models/suzanne.obj");
     glm::vec3 position = glm::vec3(0, 1, 0);
     glm::vec2 orientation = glm::vec2(0, 0);
-    glm::mat4 suzanneTransform = getConstantScale(glm::translate(glm::mat4(1.0f), {0, -1, 0}), 0.6f);
+    auto suzanneTransform = glm::mat4(1.0f);
     const GLint MODEL_MATRIX_LOCATION = modelProgram.getUniformLoc("mvp");
 
     Texture2D texSuzanne("../models/suzanneTexture.png", GL_CLAMP_TO_EDGE);
@@ -313,8 +313,9 @@ int main(int argc, char *argv[]) {
         // 3D elements
 
         // Suzanne
+        suzanneTransform = getConstantScale(glm::translate(glm::rotate(glm::mat4(1.0f), angleDeg, {orientation.x, orientation.y, 0}), {-position.x, -1, -position.z}), 0.6f);
+        updateModelMatrix(w, view, suzanneTransform, MODEL_MATRIX_LOCATION);
         if (!firstPersonView) {
-            updateModelMatrix(w, view, suzanneTransform, MODEL_MATRIX_LOCATION);
             texSuzanne.use();
             suzanne.draw();
             Texture2D::unuse();
