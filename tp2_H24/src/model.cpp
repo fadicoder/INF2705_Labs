@@ -2,7 +2,6 @@
 
 #include "obj_loader.h"
 #include "shapes.h"
-#include "utils.h"
 #include <iostream>
 
 Model::Model() : m_count(0){}
@@ -32,7 +31,7 @@ void Model::loadObj(const char *path, std::vector<GLfloat> &vertexData, std::vec
         vertexData.push_back(p.X);
         vertexData.push_back(p.Y);
         vertexData.push_back(p.Z);
-        // TODO: Décommenter lors de la partie 2
+        // Décommenter lors de la partie 2
         objl::Vector2 t = loadedVertex.TextureCoordinate;
         vertexData.push_back(t.X);
         vertexData.push_back(t.Y);

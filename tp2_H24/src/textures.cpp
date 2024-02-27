@@ -74,7 +74,7 @@ TextureCubeMap::TextureCubeMap(const char **pathes) {
             std::cout << "Error loading texture \"" << pathes[i] << "\": " << stbi_failure_reason() << std::endl;
     }
 
-    // TODO: Chargement des textures du cubemap.
+    // Chargement des textures du cubemap.
     glGenTextures(1, &this->m_id);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, this->m_id);
@@ -94,11 +94,11 @@ TextureCubeMap::TextureCubeMap(const char **pathes) {
 }
 
 TextureCubeMap::~TextureCubeMap() {
-    // TODO: Supprimer la mémoire de l'objet
+    // Supprimer la mémoire de l'objet
     glDeleteTextures(1, &this->m_id);
 }
 
 void TextureCubeMap::use() {
-    // TODO: Utilise la texture du cubemap
+    // Utilise la texture du cubemap
     glBindTexture(GL_TEXTURE_CUBE_MAP, this->m_id);
 }

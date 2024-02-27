@@ -1,6 +1,4 @@
-#include <iostream>
 #include "shapes.h"
-#include "utils.h"
 
 BasicShapeArrays::BasicShapeArrays(const GLfloat *data, GLsizeiptr byteSize) {
     // Partie 1: Générer et bind le vao de la forme.

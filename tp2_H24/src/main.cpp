@@ -67,18 +67,14 @@ void updateModelMatrix(Window &w, glm::mat4 &view, glm::mat4 &model, const GLint
 void move(Window &w, glm::vec3 &position, glm::vec2 &orientation) {
     const glm::vec3 orientationVector = glm::vec3(-glm::sin(orientation.y), 0, glm::cos(orientation.y)) * 0.40f;
     const glm::vec3 perpendicularVector = glm::vec3(-orientationVector.z, 0, orientationVector.x) * 0.25f;
-    if (w.getKeyHold(Window::Key::W)) {
+    if (w.getKeyHold(Window::Key::W))
         position += orientationVector;
-    }
-    if (w.getKeyHold(Window::Key::S)) {
+    if (w.getKeyHold(Window::Key::S))
         position -= orientationVector;
-    }
-    if (w.getKeyHold(Window::Key::A)) {
+    if (w.getKeyHold(Window::Key::A))
         position -= perpendicularVector;
-    }
-    if (w.getKeyHold(Window::Key::D)) {
+    if (w.getKeyHold(Window::Key::D))
         position += perpendicularVector;
-    }
 }
 
 void look(Window &w, glm::vec2 &orientation) {
@@ -205,13 +201,6 @@ int main(int argc, char *argv[]) {
 
     BasicShapeArrays skybox(skyboxVertices, sizeof(skyboxVertices));
     skybox.enableAttribute(0, 3, 0, 0);
-    const char *pathes[] = {"../textures/skybox/Daylight Box_Right.bmp",
-                            "../textures/skybox/Daylight Box_Left.bmp",
-                            "../textures/skybox/Daylight Box_Top.bmp",
-                            "../textures/skybox/Daylight Box_Bottom.bmp",
-                            "../textures/skybox/Daylight Box_Front.bmp",
-                            "../textures/skybox/Daylight Box_Back.bmp"
-    };
     TextureCubeMap skyboxTex(pathes);
     const GLint SKYBOX_MATRIX_LOCATION = skyboxProgram.getUniformLoc("mvp");
     const GLint SKY_TEX_UNIT_LOCATION = modelProgram.getUniformLoc("texSampler");
@@ -246,8 +235,9 @@ int main(int argc, char *argv[]) {
         float x, z;
         getGroupRandomPos(i, N_ROWS, x, z);
         glm::vec3 randomPos = glm::vec3(x, -1.0f, z);
-        groupsTransform[i] = getRandomScale(getRandomRotation(glm::translate(glm::mat4(1.0f), randomPos)));
-        treeTransform[i] = getRandomScale(getRandomRotation(glm::translate(glm::mat4(1.0f), randomPos)));
+        auto randomTranslation = glm::translate(glm::mat4(1.0f), randomPos);
+        groupsTransform[i] = getRandomScale(getRandomRotation(randomTranslation));
+        treeTransform[i] = getRandomScale(getRandomRotation(randomTranslation));
 
         auto rockPos = randomPos;
         rockPos.y += 0.2;
@@ -264,7 +254,7 @@ int main(int argc, char *argv[]) {
     Camera camera(position, orientation);
     glm::mat4 view = camera.getFirstPersonViewMatrix();
     bool firstPersonView = true;
-    int nextView = 0;
+    int nextView;
 
     // Partie 1: Donner une couleur de remplissage aux fonds.
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -288,14 +278,13 @@ int main(int argc, char *argv[]) {
         else
             view = camera.getThirdPersonViewMatrix();
 
-
         // 2D elements
         // Mets la transformation de la caméra
         modelProgram.use();
 
         // HUD
         heartTex.use();
-        glm::mat4 hudTransform = glm::translate(glm::mat4(1.0f), glm::vec3{-0.8, -0.8, 0});
+        const glm::mat4 hudTransform = glm::translate(glm::mat4(1.0f), glm::vec3{-0.8, -0.8, 0});
         glUniformMatrix4fv(MODEL_MATRIX_LOCATION, 1.0f, GL_FALSE, (GLfloat *) &hudTransform);
         redSquare.draw(GL_TRIANGLES, 6);
         Texture2D::unuse();
@@ -310,12 +299,12 @@ int main(int argc, char *argv[]) {
         // 3D elements
 
         // Suzanne
-        suzanneTransform = glm::mat4(1.0f);
-        suzanneTransform = glm::translate(suzanneTransform, {position.x, -1, position.z});
-        suzanneTransform = glm::rotate(suzanneTransform,-orientation.y,{0, 1, 0});
-        suzanneTransform = getConstantScale(suzanneTransform,0.6f);
-        updateModelMatrix(w, view, suzanneTransform, MODEL_MATRIX_LOCATION);
         if (!firstPersonView) {
+            suzanneTransform = glm::mat4(1.0f);
+            suzanneTransform = glm::translate(suzanneTransform, {position.x, -1, position.z});
+            suzanneTransform = glm::rotate(suzanneTransform,-orientation.y,{0, 1, 0});
+            suzanneTransform = getConstantScale(suzanneTransform,0.6f);
+            updateModelMatrix(w, view, suzanneTransform, MODEL_MATRIX_LOCATION);
             texSuzanne.use();
             suzanne.draw();
             Texture2D::unuse();
@@ -331,12 +320,10 @@ int main(int argc, char *argv[]) {
         waterProgram.use();
         glUniform1ui(TIME_LOCATION, w.getTick());
         updateTransformation(w, view, angleDeg, MATRIX_LOCATION_WATER);
-
         riverTex.use();
         river.draw(GL_TRIANGLES, 6);
         Texture2D::unuse();
 
-        GL_CHECK_ERROR;
         // SkyBox
         glDepthFunc(GL_EQUAL);
         skyboxProgram.use();

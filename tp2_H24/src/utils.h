@@ -7,14 +7,14 @@ void getGroupRandomPos(int groupId, const int N_ROWS, float& x, float& z);
 
 // Chemin pour les textures de skybox
 
-//const char* pathes[] = {
-//	"../textures/skybox/Daylight Box_Right.bmp",
-//	"../textures/skybox/Daylight Box_Left.bmp",
-//	"../textures/skybox/Daylight Box_Top.bmp",
-//	"../textures/skybox/Daylight Box_Bottom.bmp",
-//	"../textures/skybox/Daylight Box_Front.bmp",
-//	"../textures/skybox/Daylight Box_Back.bmp",
-//};
+const char* pathes[] = {
+	"../textures/skybox/Daylight Box_Right.bmp",
+	"../textures/skybox/Daylight Box_Left.bmp",
+	"../textures/skybox/Daylight Box_Top.bmp",
+	"../textures/skybox/Daylight Box_Bottom.bmp",
+	"../textures/skybox/Daylight Box_Front.bmp",
+	"../textures/skybox/Daylight Box_Back.bmp",
+};
 
 // Dans l'initialisation dans le main:
 /*
