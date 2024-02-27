@@ -79,17 +79,11 @@ void move(Window &w, glm::vec3 &position, glm::vec2 &orientation) {
 }
 
 void look(Window &w, glm::vec2 &orientation) {
-    const float PITCH_MOVE = 0.05f;
-    const float YAW_MOVE = 0.05f;
-    if (w.getKeyHold(Window::Key::UP)) {
-        orientation.x += PITCH_MOVE;
-    } else if (w.getKeyHold(Window::Key::DOWN)) {
-        orientation.x -= PITCH_MOVE;
-    } else if (w.getKeyHold(Window::Key::LEFT)) {
-        orientation.y -= YAW_MOVE;
-    } else if (w.getKeyHold(Window::Key::RIGHT)) {
-        orientation.y += YAW_MOVE;
-    }
+    const float FACTOR = 0.003f;
+    int mouseX, mouseY;
+    w.getMouseMotion(mouseX, mouseY);
+    orientation.x -= ((float) mouseY) * FACTOR;
+    orientation.y += ((float) mouseX) * FACTOR;
 }
 
 
