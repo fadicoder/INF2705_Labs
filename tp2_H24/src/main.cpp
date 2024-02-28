@@ -10,13 +10,13 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "utils.h"
 #include "window.h"
 #include "shader_program.h"
 #include "vertices_data.h"
 #include "shapes.h"
 #include "camera.h"
 #include "model.h"
-#include "utils.h"
 #include "textures.h"
 
 
@@ -246,8 +246,8 @@ int main(int argc, char *argv[]) {
         rockTransform[i] = getConstantScale(getRandomRotation(glm::translate(glm::mat4(1.0f), rockPos)), 0.3f);
 
         auto shroomPos = randomPos;
-        shroomPos.x += 0.7;
-        shroomPos.z += 0.7;
+        shroomPos.x += 0.3;
+        shroomPos.z += 0.3;
         shroomTransform[i] = getConstantScale(getRandomRotation(glm::translate(glm::mat4(1.0f), shroomPos)), 0.05);
     }
 

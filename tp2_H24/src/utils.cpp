@@ -5,12 +5,20 @@
 #include <GL/glew.h>
 #include <iostream>
 
+const char* pathes[] = {
+        "../textures/skybox/Daylight Box_Right.bmp",
+        "../textures/skybox/Daylight Box_Left.bmp",
+        "../textures/skybox/Daylight Box_Top.bmp",
+        "../textures/skybox/Daylight Box_Bottom.bmp",
+        "../textures/skybox/Daylight Box_Front.bmp",
+        "../textures/skybox/Daylight Box_Back.bmp",
+};
+
 double rand01() {
     static std::default_random_engine generator(std::chrono::system_clock::now().time_since_epoch().count());
     static std::uniform_real_distribution<double> distribution(0, 1);
     return distribution(generator);
 }
-
 
 void getGroupRandomPos(int groupId, const int N_ROWS, float &x, float &z) {
     const float GROUP_RADIUS = 3.5;
