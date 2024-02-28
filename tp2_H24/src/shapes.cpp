@@ -12,6 +12,7 @@ BasicShapeArrays::BasicShapeArrays(const GLfloat *data, GLsizeiptr byteSize) {
     glBindBuffer(GL_ARRAY_BUFFER, this->m_vbo);
 
     glBufferData(GL_ARRAY_BUFFER, byteSize, data, GL_STATIC_DRAW);
+    glBindVertexArray(0);
 }
 
 BasicShapeArrays::~BasicShapeArrays() {
