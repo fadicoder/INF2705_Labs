@@ -227,7 +227,6 @@ int main(int argc, char *argv[]) {
     const int N_ROWS = 7;
     const int N_GROUPS = N_ROWS * N_ROWS;
 
-    glm::mat4 groupsTransform[N_GROUPS];
     glm::mat4 treeTransform[N_GROUPS];
     glm::mat4 rockTransform[N_GROUPS];
     glm::mat4 shroomTransform[N_GROUPS];
@@ -236,16 +235,16 @@ int main(int argc, char *argv[]) {
         getGroupRandomPos(i, N_ROWS, x, z);
         glm::vec3 randomPos = glm::vec3(x, -1.0f, z);
         auto randomTranslation = glm::translate(glm::mat4(1.0f), randomPos);
-        groupsTransform[i] = getRandomScale(getRandomRotation(randomTranslation));
         treeTransform[i] = getRandomScale(getRandomRotation(randomTranslation));
 
         auto rockPos = randomPos;
-        rockPos.y += 0.2;
+        rockPos.y += 0.25;
         rockPos.x -= 0.5;
-        rockPos.z += 0.1;
+        rockPos.z += 0.6;
         rockTransform[i] = getConstantScale(getRandomRotation(glm::translate(glm::mat4(1.0f), rockPos)), 0.3f);
 
         auto shroomPos = randomPos;
+        shroomPos.y += 0.07;
         shroomPos.x += 0.3;
         shroomPos.z += 0.3;
         shroomTransform[i] = getConstantScale(getRandomRotation(glm::translate(glm::mat4(1.0f), shroomPos)), 0.05);
@@ -278,44 +277,6 @@ int main(int argc, char *argv[]) {
         else
             view = camera.getThirdPersonViewMatrix();
 
-        // 2D elements
-        // Mets la transformation de la caméra
-        modelProgram.use();
-
-        // HUD
-        heartTex.use();
-        const glm::mat4 hudTransform = glm::translate(glm::mat4(1.0f), glm::vec3{-0.8, -0.8, 0});
-        glUniformMatrix4fv(MODEL_MATRIX_LOCATION, 1.0f, GL_FALSE, (GLfloat *) &hudTransform);
-        redSquare.draw(GL_TRIANGLES, 6);
-        Texture2D::unuse();
-
-        updateTransformation(w, view, angleDeg, MODEL_MATRIX_LOCATION);
-
-        // Sol
-        groundTex.use();
-        ground.draw(GL_TRIANGLES, 6);
-        Texture2D::unuse();
-
-        // 3D elements
-
-        // Suzanne
-        if (!firstPersonView) {
-            suzanneTransform = glm::mat4(1.0f);
-            suzanneTransform = glm::translate(suzanneTransform, {position.x, -1, position.z});
-            suzanneTransform = glm::rotate(suzanneTransform,-orientation.y,{0, 1, 0});
-            suzanneTransform = getConstantScale(suzanneTransform,0.6f);
-            updateModelMatrix(w, view, suzanneTransform, MODEL_MATRIX_LOCATION);
-            texSuzanne.use();
-            suzanne.draw();
-            Texture2D::unuse();
-        }
-
-        // Vegetation
-        for (int i = 0; i < N_GROUPS; ++i) {
-            drawGroup(w, view, MODEL_MATRIX_LOCATION, tree, texTree, treeTransform[i], rock, texRock, rockTransform[i],
-                      mushroom, texShroom, shroomTransform[i]);
-        }
-
         // Riviere
         waterProgram.use();
         glUniform1ui(TIME_LOCATION, w.getTick());
@@ -324,13 +285,49 @@ int main(int argc, char *argv[]) {
         river.draw(GL_TRIANGLES, 6);
         Texture2D::unuse();
 
+        modelProgram.use();
+
+        // Suzanne
+        if (!firstPersonView) {
+            suzanneTransform = glm::mat4(1.0f);
+            suzanneTransform = glm::translate(suzanneTransform, {position.x, -1, position.z});
+            suzanneTransform = glm::rotate(suzanneTransform,-orientation.y,{0, 1, 0});
+            suzanneTransform = getConstantScale(suzanneTransform,0.5f);
+            updateModelMatrix(w, view, suzanneTransform, MODEL_MATRIX_LOCATION);
+            texSuzanne.use();
+            suzanne.draw();
+            Texture2D::unuse();
+        }
+
+        // Sol
+        updateTransformation(w, view, angleDeg, MODEL_MATRIX_LOCATION);
+        groundTex.use();
+        ground.draw(GL_TRIANGLES, 6);
+        Texture2D::unuse();
+
+        // Vegetation
+        for (int i = 0; i < N_GROUPS; ++i) {
+            drawGroup(w, view, MODEL_MATRIX_LOCATION, tree, texTree, treeTransform[i], rock, texRock, rockTransform[i],
+                      mushroom, texShroom, shroomTransform[i]);
+        }
+
         // SkyBox
-        glDepthFunc(GL_EQUAL);
         skyboxProgram.use();
+        glDepthFunc(GL_EQUAL);
         updateSkyTransformation(w, view, SKYBOX_MATRIX_LOCATION);
         skyboxTex.use();
         skybox.draw(GL_TRIANGLES, 36);
         glDepthFunc(GL_LESS);
+
+        // HUD
+        modelProgram.use();
+        glDisable(GL_DEPTH_TEST);
+        heartTex.use();
+        const glm::mat4 hudTransform = glm::translate(glm::mat4(1.0f), glm::vec3{-0.8, -0.8, 0});
+        glUniformMatrix4fv(MODEL_MATRIX_LOCATION, 1.0f, GL_FALSE, (GLfloat *) &hudTransform);
+        redSquare.draw(GL_TRIANGLES, 6);
+        Texture2D::unuse();
+        glEnable(GL_DEPTH_TEST);
 
         GL_CHECK_ERROR;
 
