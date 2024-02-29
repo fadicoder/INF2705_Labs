@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
     glm::vec3 playerPosition = glm::vec3(0);
     glm::vec2 playerOrientation = glm::vec2(0);
     Camera c(playerPosition, playerOrientation);
-    
+
     bool isFirstPersonCam = false;
     bool isMouseMotionEnabled = true;
     int scrollLevel = 8;
@@ -103,7 +103,7 @@ int main(int argc, char* argv[])
         playerOrientation.x -= y * 0.01f;
 
         glm::vec3 positionOffset = glm::vec3(0.0);
-        const float SPEED = 0.01f;
+        const float SPEED = 0.5f;
         if (w.getKeyHold(Window::Key::W))
             positionOffset.z -= SPEED;
         if (w.getKeyHold(Window::Key::S))

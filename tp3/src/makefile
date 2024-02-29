@@ -25,6 +25,7 @@ EXE=$(BUILD)/tp1.exe
 SRC = $(wildcard *.cpp) $(wildcard */*.cpp)
 OBJ = $(addprefix $(BUILD)/, $(notdir $(SRC:.cpp=.o)))
 
+all: run
 exe : $(EXE)
 run : exe
 	$(EXE)

@@ -82,3 +82,30 @@ void ShaderProgram::checkError()
         std::cout << "Program linking error: " << infoLog << std::endl;
     }
 }
+
+void ShaderProgram::setupShaderProgram(const char *fragmentShader, const char *vertexShader) {
+    std::string str = readFile(fragmentShader);
+    std::string vstr = readFile(vertexShader);
+
+    Shader fragShader(GL_FRAGMENT_SHADER, str.c_str());
+    Shader vertShader(GL_VERTEX_SHADER, vstr.c_str());
+
+    this->attachShader(vertShader);
+    this->attachShader(fragShader);
+    this->link();
+}
+
+void ShaderProgram::setupShaderProgram(const char *fragmentShader, const char *vertexShader, const char* geometryShader) {
+    std::string str = readFile(fragmentShader);
+    std::string vstr = readFile(vertexShader);
+    std::string gstr = readFile(geometryShader);
+
+    Shader fragShader(GL_FRAGMENT_SHADER, str.c_str());
+    Shader vertShader(GL_VERTEX_SHADER, vstr.c_str());
+    Shader geoShader(GL_GEOMETRY_SHADER, gstr.c_str());
+
+    this->attachShader(vertShader);
+    this->attachShader(fragShader);
+    this->attachShader(geoShader);
+    this->link();
+}

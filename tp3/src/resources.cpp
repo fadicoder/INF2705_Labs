@@ -41,28 +41,14 @@ Resources::Resources()
 
     // Model shader
     {
-        std::string vertexCode = readFile("shaders/model.vs.glsl");
-        std::string fragmentCode = readFile("shaders/model.fs.glsl");
-
-        Shader vertex(GL_VERTEX_SHADER, vertexCode.c_str());
-        Shader fragment(GL_FRAGMENT_SHADER, fragmentCode.c_str());
-        model.attachShader(vertex);
-        model.attachShader(fragment);
-        model.link();
+        model.setupShaderProgram("shaders/model.fs.glsl", "shaders/model.vs.glsl");
         mvpLocationModel = model.getUniformLoc("mvp");
     }
     GL_CHECK_ERROR;
 
     // Phong shader
     {
-        std::string vertexCode = readFile("shaders/phong.vs.glsl");
-        std::string fragmentCode = readFile("shaders/phong.fs.glsl");
-
-        Shader vertex(GL_VERTEX_SHADER, vertexCode.c_str());
-        Shader fragment(GL_FRAGMENT_SHADER, fragmentCode.c_str());
-        phong.attachShader(vertex);
-        phong.attachShader(fragment);
-        phong.link();
+        phong.setupShaderProgram("shaders/phong.fs.glsl", "shaders/phong.vs.glsl");
         mvpLocationPhong = phong.getUniformLoc("mvp");
         modelViewLocationPhong = phong.getUniformLoc("modelView");
         viewLocationPhong = phong.getUniformLoc("view");
@@ -75,14 +61,7 @@ Resources::Resources()
 
     // Gouraud shader
     {
-        std::string vertexCode = readFile("shaders/gouraud.vs.glsl");
-        std::string fragmentCode = readFile("shaders/gouraud.fs.glsl");
-
-        Shader vertex(GL_VERTEX_SHADER, vertexCode.c_str());
-        Shader fragment(GL_FRAGMENT_SHADER, fragmentCode.c_str());
-        gouraud.attachShader(vertex);
-        gouraud.attachShader(fragment);
-        gouraud.link();
+        gouraud.setupShaderProgram("shaders/gouraud.fs.glsl", "shaders/gouraud.vs.glsl");
         mvpLocationGouraud = gouraud.getUniformLoc("mvp");
         modelViewLocationGouraud = gouraud.getUniformLoc("modelView");
         viewLocationGouraud = gouraud.getUniformLoc("view");
@@ -95,17 +74,7 @@ Resources::Resources()
 
     // Flat shader
     {
-        std::string vertexCode = readFile("shaders/flat.vs.glsl");
-        std::string geometryCode = readFile("shaders/flat.gs.glsl");
-        std::string fragmentCode = readFile("shaders/gouraud.fs.glsl");
-
-        Shader vertex(GL_VERTEX_SHADER, vertexCode.c_str());
-        Shader geometry(GL_GEOMETRY_SHADER, geometryCode.c_str());
-        Shader fragment(GL_FRAGMENT_SHADER, fragmentCode.c_str());
-        flat.attachShader(vertex);
-        flat.attachShader(geometry);
-        flat.attachShader(fragment);
-        flat.link();
+        flat.setupShaderProgram("shaders/gouraud.fs.glsl", "shaders/flat.vs.glsl", "shaders/flat.gs.glsl");
         mvpLocationFlat = flat.getUniformLoc("mvp");
         modelViewLocationFlat = flat.getUniformLoc("modelView");
         viewLocationFlat = flat.getUniformLoc("view");
@@ -127,14 +96,7 @@ Resources::Resources()
 
     // Skybox shader
     {
-        std::string vertexCode = readFile("shaders/skybox.vs.glsl");
-        std::string fragmentCode = readFile("shaders/skybox.fs.glsl");
-        Shader vertex(GL_VERTEX_SHADER, vertexCode.c_str());
-        Shader fragment(GL_FRAGMENT_SHADER, fragmentCode.c_str());
-        skyboxShader.attachShader(vertex);
-        skyboxShader.attachShader(fragment);
-        skyboxShader.link();
-
+        skyboxShader.setupShaderProgram("shaders/skybox.fs.glsl", "shaders/skybox.vs.glsl");
         mvpLocationSky = skyboxShader.getUniformLoc("mvp");
     }
     GL_CHECK_ERROR;

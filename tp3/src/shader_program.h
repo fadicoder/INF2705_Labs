@@ -23,11 +23,13 @@ class ShaderProgram
 public:
     ShaderProgram();
     ~ShaderProgram();
-    
-    void use();    
+
+    void setupShaderProgram(const char* fragmentShader, const char* vertexShader);
+    void setupShaderProgram(const char* fragmentShader, const char* vertexShader, const char* geometryShader);
+    void use();
     void attachShader(Shader& s);    
     void link();
-    
+
     GLint getUniformLoc(const char* name);
     void setUniformBlockBinding(const char* name, GLuint bindingIndex);
     

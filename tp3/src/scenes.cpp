@@ -40,7 +40,7 @@ StencilTestScene::StencilTestScene(Resources& resources, bool& isFirstPersonCam,
 {
     const GLfloat GROUND_SIZE = 30.0f/2.0f;
     // CALCULATE MATRIX TRANSFORMS FOR GROUPS AND OBJECTS
-    for (int i = 0; i < N_ALLY_MONKEE; ++i)
+    for (auto & transform : allyTransform)
     {
         float x = -GROUND_SIZE + 2 * GROUND_SIZE * rand01();
         float y = -GROUND_SIZE + 2 * GROUND_SIZE * rand01();
@@ -48,10 +48,10 @@ StencilTestScene::StencilTestScene(Resources& resources, bool& isFirstPersonCam,
         model = glm::translate(model, glm::vec3(x, -1, y));
         model = glm::rotate(model, float(M_PI * 2 * rand01()), glm::vec3(0, 1, 0));
         model = glm::scale(model, glm::vec3(0.5));
-        allyTransform[i] = model;
+        transform = model;
     }
 
-    for (int i = 0; i < N_ENEMY_MONKEE; ++i)
+    for (auto & transform : enemyTransform)
     {
         float x = -GROUND_SIZE + 2 * GROUND_SIZE * rand01();
         float y = -GROUND_SIZE + 2 * GROUND_SIZE * rand01();
@@ -59,7 +59,7 @@ StencilTestScene::StencilTestScene(Resources& resources, bool& isFirstPersonCam,
         model = glm::translate(model, glm::vec3(x, -1, y));
         model = glm::rotate(model, float(M_PI * 2 * rand01()), glm::vec3(0, 1, 0));
         model = glm::scale(model, glm::vec3(0.5));
-        enemyTransform[i] = model;
+        transform = model;
     }
 }
 
