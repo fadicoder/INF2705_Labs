@@ -51,6 +51,7 @@ Resources::Resources()
         model.link();
         mvpLocationModel = model.getUniformLoc("mvp");
     }
+    GL_CHECK_ERROR;
 
     // Phong shader
     {
@@ -70,6 +71,7 @@ Resources::Resources()
         glUniform1i(phong.getUniformLoc("diffuseSampler"), 0);
         glUniform1i(phong.getUniformLoc("specularSampler"), 1);
     }
+    GL_CHECK_ERROR;
 
     // Gouraud shader
     {
@@ -89,6 +91,7 @@ Resources::Resources()
         glUniform1i(gouraud.getUniformLoc("diffuseSampler"), 0);
         glUniform1i(gouraud.getUniformLoc("specularSampler"), 1);
     }
+    GL_CHECK_ERROR;
 
     // Flat shader
     {
@@ -111,20 +114,16 @@ Resources::Resources()
         glUniform1i(flat.getUniformLoc("diffuseSampler"), 0);
         glUniform1i(flat.getUniformLoc("specularSampler"), 1);
     }
+    GL_CHECK_ERROR;
+
 
     // Simple shader
     {
-        std::string vertexCode = readFile("shaders/simple.vs.glsl");
-        std::string fragmentCode = readFile("shaders/simple.fs.glsl");
-        Shader vertex(GL_VERTEX_SHADER, vertexCode.c_str());
-        Shader fragment(GL_FRAGMENT_SHADER, fragmentCode.c_str());
-        simple.attachShader(vertex);
-        simple.attachShader(fragment);
-        simple.link();
-
+        simple.setupShaderProgram("shaders/simple.fs.glsl", "shaders/simple.vs.glsl");
         mvpLocationSimple = simple.getUniformLoc("mvp");
         colorLocationSimple = simple.getUniformLoc("color");
     }
+    GL_CHECK_ERROR;
 
     // Skybox shader
     {
@@ -138,4 +137,5 @@ Resources::Resources()
 
         mvpLocationSky = skyboxShader.getUniformLoc("mvp");
     }
+    GL_CHECK_ERROR;
 }

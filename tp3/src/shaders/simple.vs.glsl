@@ -8,4 +8,5 @@ uniform mat4 mvp;
 void main()
 {
     // TODO
+    gl_Position = mvp * vec4((position + (normalize(normal) * 0.1f)), 1.0f); // Pour aggrandir la halo
 }
