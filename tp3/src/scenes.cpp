@@ -106,22 +106,24 @@ void StencilTestScene::render(glm::mat4& view, glm::mat4& projPersp)
     m_res.ground.draw(GL_TRIANGLES, 6);
 
 
-    // TODO: Précalcul des matrices mvp des singes,
+    // Précalcul des matrices mvp des singes,
 	// utilisable pour les modèles et halos.
+     glm::mat4 enemyMvp[N_ENEMY_MONKEE];
+     glm::mat4 allyMvp[N_ALLY_MONKEE];
 
     m_res.suzanneTexture.use();
     glEnable(GL_STENCIL_TEST);
     glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
     for (size_t i = 0; i < N_ENEMY_MONKEE; ++i) { // dessiner enemies
-        glm::mat4 monkeyMvp = projView * enemyTransform[i];
-        glUniformMatrix4fv(m_res.mvpLocationModel, 1, GL_FALSE, &monkeyMvp[0][0]);
+        enemyMvp[i] = projView * enemyTransform[i];
+        glUniformMatrix4fv(m_res.mvpLocationModel, 1, GL_FALSE, &enemyMvp[i][0][0]);
         // Remplir le stencil en dessinant les singes
         glStencilFunc(GL_ALWAYS, 2, i);
         m_res.suzanne.draw();
     }
     for (size_t i = 0; i < N_ALLY_MONKEE; ++i) { // dessiner allies
-        glm::mat4 monkeyMvp = projView * allyTransform[i];
-        glUniformMatrix4fv(m_res.mvpLocationModel, 1, GL_FALSE, &monkeyMvp[0][0]);
+        allyMvp[i] = projView * allyTransform[i];
+        glUniformMatrix4fv(m_res.mvpLocationModel, 1, GL_FALSE, &allyMvp[i][0][0]);
         // Remplir le stencil en dessinant les singes
         glStencilFunc(GL_ALWAYS, 2, i);
         m_res.suzanne.draw();
@@ -152,17 +154,15 @@ void StencilTestScene::render(glm::mat4& view, glm::mat4& projPersp)
     glStencilFunc(GL_GREATER, 1, 0xff);
     glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
     for (size_t i = 0; i < N_ENEMY_MONKEE; ++i) {
-        glm::mat4 monkeyMvp = projView * enemyTransform[i];
         const glm::vec3 enemyColor(1.0f, 0.0f, 0.0f);
-        glUniformMatrix4fv(m_res.mvpLocationSimple, 1, GL_FALSE, &monkeyMvp[0][0]);
+        glUniformMatrix4fv(m_res.mvpLocationSimple, 1, GL_FALSE, &enemyMvp[i][0][0]);
         glUniform3fv(m_res.colorLocationSimple, 1, (float*) &enemyColor);
         m_res.suzanne.draw();
     }
     glDisable(GL_DEPTH_TEST);
     for (size_t i = 0; i < N_ALLY_MONKEE; ++i) {
-        glm::mat4 monkeyMvp = projView * allyTransform[i];
         const glm::vec3 allyColor(0.0f, 0.0f, 1.0f);
-        glUniformMatrix4fv(m_res.mvpLocationSimple, 1, GL_FALSE, &monkeyMvp[0][0]);
+        glUniformMatrix4fv(m_res.mvpLocationSimple, 1, GL_FALSE, &allyMvp[i][0][0]);
         glUniform3fv(m_res.colorLocationSimple, 1, (float*) &allyColor);
         m_res.suzanne.draw();
     }
