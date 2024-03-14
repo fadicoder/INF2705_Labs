@@ -137,7 +137,7 @@ void StencilTestScene::render(glm::mat4& view, glm::mat4& projPersp)
     m_res.model.use();
     m_res.glassTexture.use();
     
-	// TODO: Dessin du mur vitrée
+	// Dessin du mur vitrée
     glDisable(GL_CULL_FACE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA);

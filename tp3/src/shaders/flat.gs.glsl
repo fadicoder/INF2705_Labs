@@ -1,7 +1,7 @@
 #version 330 core
 
-layout(triangles) in;
-layout(triangle_strip, max_vertices = 3) out;
+layout (triangles) in;
+layout (triangle_strip, max_vertices = 3) out;
 
 in ATTRIB_OUT
 {
@@ -11,7 +11,7 @@ in ATTRIB_OUT
 
 out ATTRIB_VS_OUT
 {
-    vec2 texCoords;    
+    vec2 texCoords;
     vec3 emission;
     vec3 ambient;
     vec3 diffuse;
@@ -56,5 +56,13 @@ layout (std140) uniform LightingBlock
 
 void main()
 {
-	// TODO    
+    for (int i = 0; i < 3; i++) {
+        gl_Position = gl_in[i].gl_Position;
+        attribOut.texCoords = attribIn[i].texCoords;
+        attribOut.emission = vec3(1);
+        attribOut.ambient = vec3(1);
+        attribOut.diffuse = vec3(1);
+        attribOut.specular = vec3(1);
+        EmitVertex();
+    }
 }
