@@ -16,5 +16,5 @@ out vec4 FragColor;
 
 void main()
 {
-    // TODO
+   FragColor = vec4(attribIn.diffuse, 1.0);
 }
