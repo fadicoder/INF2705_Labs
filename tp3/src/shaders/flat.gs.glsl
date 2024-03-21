@@ -53,14 +53,13 @@ layout (std140) uniform LightingBlock
 };
 
 
-
 void main()
 {
     for (int i = 0; i < 3; i++) {
         gl_Position = gl_in[i].gl_Position;
         attribOut.texCoords = attribIn[i].texCoords;
 
-        // Calculate emission: I think it is ok, it does not give me any error
+        // Calculate emission
         vec3 emissionFactor = vec3(1.0);
         if(useSpotlight) {
             vec3 cosY = cos(normalMatrix * lights[i].spotDirection);
@@ -72,9 +71,23 @@ void main()
         }
         attribOut.emission = mat.emission * emissionFactor;
 
-        attribOut.ambient = lights[i].ambient * mat.ambient;
-        attribOut.diffuse = lights[i].diffuse * mat.diffuse;
-        attribOut.specular = lights[i].specular * mat.specular;
+        vec3 sum = lights[0].ambient;
+        for (int j = 1; j < 3; j++) {
+            sum += lights[j].ambient;
+        }
+        attribOut.ambient = sum * mat.ambient;
+
+        sum = lights[0].diffuse;
+        for (int j = 1; j < 3; j++) {
+            sum += lights[j].diffuse;
+        }
+        attribOut.diffuse = sum * mat.diffuse;
+
+        sum = lights[0].specular;
+        for (int j = 1; j < 3; j++) {
+            sum += lights[j].specular;
+        }
+        attribOut.specular = sum * mat.specular;
         EmitVertex();
     }
 }
