@@ -52,5 +52,26 @@ layout (std140) uniform LightingBlock
 
 void main()
 {
-    // TODO
+    gl_Position = mvp * vec4(position, 1.0);
+    attribOut.texCoords = texCoords;
+
+    // Calculate emission: I think it is ok, it does not give me any error
+    attribOut.emission = mat.emission;
+    vec3 sum = lights[0].ambient;
+    for (int j = 1; j < 3; j++) {
+        sum += lights[j].ambient;
+    }
+    attribOut.ambient = sum + mat.ambient;
+
+    sum = lights[0].diffuse;
+    for (int j = 1; j < 3; j++) {
+        sum += lights[j].diffuse;
+    }
+    attribOut.diffuse = sum + mat.diffuse;
+
+    sum = lights[0].specular;
+    for (int j = 1; j < 3; j++) {
+        sum += lights[j].specular;
+    }
+    attribOut.specular = sum + mat.specular;
 }

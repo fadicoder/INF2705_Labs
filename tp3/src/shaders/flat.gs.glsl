@@ -55,6 +55,9 @@ layout (std140) uniform LightingBlock
 
 void main()
 {
+//    vec3 side1 = gl_in[1].gl_Position - gl_in[0].gl_Position;
+//    vec3 side2 = gl_in[2].gl_Position - gl_in[0].gl_Position;
+//    vec3 normal = cross(side1, side2);
     for (int i = 0; i < 3; i++) {
         gl_Position = gl_in[i].gl_Position;
         attribOut.texCoords = attribIn[i].texCoords;
