@@ -98,9 +98,9 @@ void main() {
     vec3 pos = (modelView * vec4(position, 1.0)).xyz;
     vec3 obsPos = normalize(-pos);
 
-    lightDir[0] = (view * vec4(lights[0].position, 1.0f)).xyz - pos ;
-    lightDir[1] = (view * vec4(lights[1].position, 1.0f)).xyz - pos ;
-    lightDir[2] = (view * vec4(lights[2].position, 1.0f)).xyz - pos ;
+    lightDir[0] = (view * vec4(lights[0].position, 1.0f)).xyz - pos;
+    lightDir[1] = (view * vec4(lights[1].position, 1.0f)).xyz - pos;
+    lightDir[2] = (view * vec4(lights[2].position, 1.0f)).xyz - pos;
 
     spotDir[0] = mat3(view) * -lights[0].spotDirection;
     spotDir[1] = mat3(view) * -lights[1].spotDirection;

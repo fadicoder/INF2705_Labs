@@ -53,44 +53,75 @@ layout (std140) uniform LightingBlock
 };
 
 
-void main()
-{
-//    vec3 side1 = gl_in[1].gl_Position - gl_in[0].gl_Position;
-//    vec3 side2 = gl_in[2].gl_Position - gl_in[0].gl_Position;
-//    vec3 normal = cross(side1, side2);
+float calculateSpot(vec3 l, vec3 n, vec3 spotDirectin) {
+    float spotFacteur = 0.0;
+    if (dot(spotDirectin, n) >= 0 ) {
+        float spotDot = dot(l, spotDirectin);
+        if (spotDot > cos(radians(spotOpeningAngle))) {
+            spotFacteur = pow(spotDot, spotExponent);
+        }
+    }
+    return spotFacteur;
+}
+
+void calculateReflexion(vec3 n, vec3 o, vec3 lightDir, vec3 spotDir, int spotIndex) {
+    vec3 l = normalize(lightDir);
+    float dist = length(lightDir);
+
+    float distFactor = min(1.0 / (dist*dist), 1.0);
+    float dotProd = dot(n, l);
+
+    // seulment calucler diffuse et speculaire quand la face est éclairée.
+    if (dotProd > 0.0) {
+        // Diffuse:
+        attribOut.diffuse += ((mat.diffuse * lights[spotIndex].diffuse * dotProd) * distFactor);
+
+        // Spectulaire:
+        // Calculer l'intensité de la réflection spéculaire selon la formule de Blinn ou Phong. Elle dépend de la position de la lumière, de la normale et de la position de l'observateur.
+        float specIntensity = useBlinn ? dot(normalize(l + o), n) : dot(reflect(-l, n), o);
+
+        // Si le résultat est positif (il y a de la réflexion spéculaire).
+        if (specIntensity > 0) {
+            float shine = pow(specIntensity, mat.shininess);
+            attribOut.specular += (shine * mat.specular * lights[spotIndex].specular) * distFactor;
+        }
+    }
+    if (useSpotlight) {
+        attribOut.diffuse *= calculateSpot(l, n, spotDir);
+        attribOut.specular *= calculateSpot(l, n, spotDir);
+    }
+}
+
+
+void main() {
+    vec3 side1 = attribIn[1].position - attribIn[0].position;
+    vec3 side2 = attribIn[2].position - attribIn[0].position;
+    vec3 normal = normalize(cross(side1 , side2));
+
+    attribOut.emission = mat.emission;
+
+    attribOut.ambient = mat.ambient * lightModelAmbient;
+    for (int j = 0; j < 3; j++) {
+        attribOut.ambient += (mat.ambient * lights[j].ambient);
+    }
+
+    vec3 center = (attribIn[0].position + attribIn[1].position + attribIn[2].position) / 3.0;
+    vec3 pos = vec3(modelView * vec4(center, 1));
+
+
+    attribOut.specular = vec3(0.0, 0.0, 0.0);
+    attribOut.diffuse = vec3(0.0, 0.0, 0.0);
+    for (int j = 0; j < 3; j++) {
+        vec3 o = normalize(-pos);
+        vec3 lightDirection = (view * vec4(lights[j].position, 1.0f)).xyz - pos;
+        vec3 lightDir = (view * vec4(lights[j].position, 1.0f)).xyz - pos;
+        vec3 spotDirection = mat3(view) * -lights[j].spotDirection;
+        calculateReflexion(normal, o, lightDirection, spotDirection, j);
+    }
+
     for (int i = 0; i < 3; i++) {
         gl_Position = gl_in[i].gl_Position;
         attribOut.texCoords = attribIn[i].texCoords;
-
-        // Calculate emission
-        vec3 emissionFactor = vec3(1.0);
-        if(useSpotlight) {
-            vec3 cosY = cos(normalMatrix * lights[i].spotDirection);
-            if (useDirect3D) {
-                emissionFactor = smoothstep(pow(cos(spotOpeningAngle), (1.01 + spotExponent / 2)), cos(spotOpeningAngle), cosY);
-            } else {
-                emissionFactor = vec3(pow(cosY.x, spotExponent),pow(cosY.y, spotExponent), pow(cosY.z, spotExponent));
-            }
-        }
-        attribOut.emission = mat.emission * emissionFactor;
-
-        vec3 sum = lights[0].ambient;
-        for (int j = 1; j < 3; j++) {
-            sum += lights[j].ambient;
-        }
-        attribOut.ambient = sum * mat.ambient;
-
-        sum = lights[0].diffuse;
-        for (int j = 1; j < 3; j++) {
-            sum += lights[j].diffuse;
-        }
-        attribOut.diffuse = sum * mat.diffuse;
-
-        sum = lights[0].specular;
-        for (int j = 1; j < 3; j++) {
-            sum += lights[j].specular;
-        }
-        attribOut.specular = sum * mat.specular;
         EmitVertex();
     }
 }
