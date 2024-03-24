@@ -49,29 +49,79 @@ layout (std140) uniform LightingBlock
 };
 
 
+float calculateSpot(vec3 l, vec3 n, vec3 spotDirectin) {
+    float spotFacteur = 0.0;
+    if (dot(spotDirectin, n) >= 0 ) {
+        float spotDot = dot(l, spotDirectin);
+        if (spotDot > cos(radians(spotOpeningAngle))) {
+            spotFacteur = pow(spotDot, spotExponent);
+        }
+    }
+    return spotFacteur;
+}
 
-void main()
-{
+void calculateReflexion(vec3 n, vec3 o, vec3[3] lightDir, vec3[3] spotDir, int spotIndex) {
+    vec3 l = normalize(lightDir[spotIndex]);
+    float dist = length(lightDir[spotIndex]);
+
+    float distFactor = min(1.0 / (dist*dist), 1.0);
+    float dotProd = dot(n, l);
+
+    // seulment calucler diffuse et speculaire quand la face est éclairée.
+    if (dotProd > 0.0) {
+        // Diffuse:
+        attribOut.diffuse += (mat.diffuse * lights[spotIndex].diffuse * dotProd) * distFactor;
+
+        // Spectulaire:
+        // Calculer l'intensité de la réflection spéculaire selon la formule de Blinn ou Phong. Elle dépend de la position de la lumière, de la normale et de la position de l'observateur.
+        float specIntensity = useBlinn ? dot(normalize(l + o), n) : dot(reflect(-l, n), o);
+
+        // Si le résultat est positif (il y a de la réflexion spéculaire).
+        if (specIntensity > 0) {
+            float shine = pow(specIntensity, mat.shininess);
+            attribOut.specular += (shine * mat.specular * lights[spotIndex].specular) * distFactor;
+        }
+    }
+    if (useSpotlight) {
+        attribOut.diffuse *= calculateSpot(l, n, spotDir[spotIndex]);
+        attribOut.specular *= calculateSpot(l, n, spotDir[spotIndex]);
+    }
+}
+
+
+
+void main() {
+    // La position du sommet dans le référentiel de la caméra (donc coords de visualisation).
+    vec3 transformedNormal = normalMatrix * normal;
+    vec3 lightDir[3];
+    vec3 spotDir[3];
+    vec3 pos = (modelView * vec4(position, 1.0)).xyz;
+    vec3 obsPos = normalize(-pos);
+
+    lightDir[0] = (view * vec4(lights[0].position, 1.0f)).xyz - pos ;
+    lightDir[1] = (view * vec4(lights[1].position, 1.0f)).xyz - pos ;
+    lightDir[2] = (view * vec4(lights[2].position, 1.0f)).xyz - pos ;
+
+    spotDir[0] = mat3(view) * -lights[0].spotDirection;
+    spotDir[1] = mat3(view) * -lights[1].spotDirection;
+    spotDir[2] = mat3(view) * -lights[2].spotDirection;
+
     gl_Position = mvp * vec4(position, 1.0);
     attribOut.texCoords = texCoords;
 
-    // Calculate emission: I think it is ok, it does not give me any error
+    // Emission
     attribOut.emission = mat.emission;
-    vec3 sum = lights[0].ambient;
-    for (int j = 1; j < 3; j++) {
-        sum += lights[j].ambient;
-    }
-    attribOut.ambient = sum + mat.ambient;
 
-    sum = lights[0].diffuse;
-    for (int j = 1; j < 3; j++) {
-        sum += lights[j].diffuse;
+    // Ambiant
+    attribOut.ambient = mat.ambient * lightModelAmbient;
+    for (int j = 0; j < 3; j++) {
+        attribOut.ambient += mat.ambient * lights[j].ambient;
     }
-    attribOut.diffuse = sum + mat.diffuse;
 
-    sum = lights[0].specular;
-    for (int j = 1; j < 3; j++) {
-        sum += lights[j].specular;
+    // Diffuse & specular
+    attribOut.diffuse = vec3(0.0, 0.0, 0.0);
+    attribOut.specular = vec3(0.0, 0.0, 0.0);
+    for (int j = 0; j < 3; j++) {
+        calculateReflexion(transformedNormal, obsPos, lightDir, spotDir, j);
     }
-    attribOut.specular = sum + mat.specular;
 }

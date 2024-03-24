@@ -81,14 +81,12 @@ vec3 calculateReflexion(vec3 n, vec3 o, int spotIndex) {
         // Si le résultat est positif (il y a de la réflexion spéculaire).
         if (specIntensity > 0) {
             float shine = pow(specIntensity, mat.shininess);
-            reflexionColor += (shine * mat.specular * lights[0].specular) * distFactor;
+            reflexionColor += (shine * mat.specular * lights[spotIndex].specular) * distFactor;
         }
     }
-
     if (useSpotlight) {
         reflexionColor *= calculateSpot(l, n, spotIndex);
     }
-
     return reflexionColor;
 }
 
