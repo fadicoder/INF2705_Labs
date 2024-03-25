@@ -54,17 +54,17 @@ struct Reflexions {
 };
 
 
-float calculateSpot(vec3 l, vec3 n, vec3 spotDirectin) {
+float calculateSpot(vec3 l, vec3 n, vec3 spotDirection) {
     float spotFacteur = 0.0;
-    if (dot(spotDirectin, n) >= 0 ) {
-        float dotPorduct = dot(l, spotDirectin);
-        if (dotPorduct > cos(radians(spotOpeningAngle))) {
+    if (dot(spotDirection, n) >= 0 ) {
+        float dotProduct = dot(l, spotDirection);
+        if (dotProduct > cos(radians(spotOpeningAngle))) {
             if (useDirect3D) {
                 float cosInner = cos(radians(spotOpeningAngle));
                 float cosOuter = pow(cosInner, 1.01 + (spotExponent / 2));
-                spotFacteur = smoothstep(cosOuter, cosInner, dotPorduct);
+                spotFacteur = smoothstep(cosOuter, cosInner, dotProduct);
             } else {
-                spotFacteur = pow(dotPorduct, spotExponent);
+                spotFacteur = pow(dotProduct, spotExponent);
             }
         }
     }

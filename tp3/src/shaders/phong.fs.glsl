@@ -57,17 +57,17 @@ struct Reflexions {
 };
 
 
-float calculateSpot(vec3 l, vec3 n, vec3 spotDirectin) {
+float calculateSpot(vec3 l, vec3 n, vec3 spotDirection) {
     float spotFacteur = 0.0;
-    if (dot(spotDirectin, n) >= 0 ) {
-        float dotPorduct = dot(l, spotDirectin);
-        if (dotPorduct > cos(radians(spotOpeningAngle))) {
+    if (dot(spotDirection, n) >= 0 ) {
+        float dotProduct = dot(l, spotDirection);
+        if (dotProduct > cos(radians(spotOpeningAngle))) {
             if (useDirect3D) {
                 float cosInner = cos(radians(spotOpeningAngle));
                 float cosOuter = pow(cosInner, 1.01 + (spotExponent / 2));
-                spotFacteur = smoothstep(cosOuter, cosInner, dotPorduct);
+                spotFacteur = smoothstep(cosOuter, cosInner, dotProduct);
             } else {
-                spotFacteur = pow(dotPorduct, spotExponent);
+                spotFacteur = pow(dotProduct, spotExponent);
             }
         }
     }
@@ -104,7 +104,7 @@ Reflexions calculateReflexion(vec3 n, vec3 o, int spotIndex) {
 
     // spot:
     if (useSpotlight) {
-        float spotFactor = calculateSpot(l, n, attribIn.spotDir[spotIndex]);
+        float spotFactor = calculateSpot(l, n, normalize(attribIn.spotDir[spotIndex]));
         result.diffuse *= spotFactor;
         result.specular *= spotFactor;
     }
@@ -112,6 +112,9 @@ Reflexions calculateReflexion(vec3 n, vec3 o, int spotIndex) {
 }
 
 void main() {
+    vec4 diffuseTexture = texture(diffuseSampler, attribIn.texCoords);
+    if (diffuseTexture.a < 0.3) discard;
+
     vec3 n = normalize(gl_FrontFacing ? attribIn.normal : -attribIn.normal);
     vec3 o = normalize(attribIn.obsPos);
 
@@ -135,8 +138,6 @@ void main() {
         specularI += reflexions.specular;
     }
 
-    vec4 diffuseTexture = texture(diffuseSampler, attribIn.texCoords);
-    if (diffuseTexture.a < 0.3) discard;
     vec3 diffuseColor = diffuseTexture.xyz * (diffuseI + ambiantI);
     vec3 specularColor = texture(specularSampler, attribIn.texCoords).xyz * specularI;
     FragColor = vec4(emissionI + specularColor + diffuseColor, 1.0);
