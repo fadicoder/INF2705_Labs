@@ -61,7 +61,7 @@ void main() {
     // Calculer la position de la lumière en coords de visualisation (light.position est en coordonnées de scène).
     for (int i = 0; i < 3; i++) {
         attribOut.lightDir[i] = (modelView * vec4(lights[i].position, 1.0f)).xyz - pos;
-        attribOut.spotDir[i] = mat3(modelView) * -lights[0].spotDirection;
+        attribOut.spotDir[i] = mat3(modelView) * -lights[i].spotDirection;
     }
 
     attribOut.obsPos = -pos;
