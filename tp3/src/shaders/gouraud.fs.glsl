@@ -21,4 +21,5 @@ void main()
     vec3 diffuseColor = diffuseTex.xyz * (attribIn.diffuse + attribIn.ambient);
     vec3 specularColor = texture(specularSampler, attribIn.texCoords).xyz * attribIn.specular;
     FragColor = vec4(attribIn.emission + specularColor + diffuseColor, 1.0);
+    FragColor = clamp(FragColor, 0.0, 1.0);
 }

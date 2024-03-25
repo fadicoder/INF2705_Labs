@@ -101,8 +101,9 @@ Reflexions calculateReflexion(vec3 n, vec3 o, vec3 lightDir, vec3 spotDir, int s
 
     // spot:
     if (useSpotlight) {
-        result.diffuse *= calculateSpot(l, n, spotDir);
-        result.specular *= calculateSpot(l, n, spotDir);
+        float spotFactor = calculateSpot(l, n, spotDir);
+        result.diffuse *= spotFactor;
+        result.specular *= spotFactor;
     }
     return result;
 }
@@ -116,7 +117,7 @@ void main() {
     // La position du sommet dans le référentiel de la caméra (donc coords de visualisation).
     vec3 transformedNormal = normalMatrix * normal;
     vec3 pos = (modelView * vec4(position, 1.0)).xyz;
-    vec3 obsPos = normalize(-pos);
+    vec3 obsPos = -pos;
 
     // Emission
     attribOut.emission = mat.emission;
@@ -133,7 +134,7 @@ void main() {
     for (int i = 0; i < 3; i++) {
         vec3 lightDir = (modelView * vec4(lights[i].position, 1.0f)).xyz - pos;
         vec3 spotDir = mat3(modelView) * -lights[i].spotDirection;
-        Reflexions reflexions = calculateReflexion(transformedNormal, obsPos, lightDir, spotDir, i);
+        Reflexions reflexions = calculateReflexion(transformedNormal, normalize(obsPos), lightDir, spotDir, i);
         attribOut.diffuse += reflexions.diffuse;
         attribOut.specular += reflexions.specular;
     }

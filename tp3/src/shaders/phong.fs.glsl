@@ -51,28 +51,45 @@ uniform sampler2D specularSampler;
 
 out vec4 FragColor;
 
-float calculateSpot(vec3 l, vec3 n, int spotIndex) {
+struct Reflexions {
+    vec3 diffuse;
+    vec3 specular;
+};
+
+
+float calculateSpot(vec3 l, vec3 n, vec3 spotDirectin) {
     float spotFacteur = 0.0;
-    vec3 d = attribIn.spotDir[spotIndex];
-    if (dot(d, n) >= 0 ) {
-        float spotDot = dot(l, d);
-        if (spotDot > cos(radians(spotOpeningAngle))) {
-            spotFacteur = pow(spotDot, spotExponent);
+    if (dot(spotDirectin, n) >= 0 ) {
+        float dotPorduct = dot(l, spotDirectin);
+        if (dotPorduct > cos(radians(spotOpeningAngle))) {
+            if (useDirect3D) {
+                float cosInner = cos(radians(spotOpeningAngle));
+                float cosOuter = pow(cosInner, 1.01 + (spotExponent / 2));
+                spotFacteur = smoothstep(cosOuter, cosInner, dotPorduct);
+            } else {
+                spotFacteur = pow(dotPorduct, spotExponent);
+            }
         }
     }
     return spotFacteur;
 }
 
-vec3 calculateReflexion(vec3 n, vec3 o, int spotIndex) {
+Reflexions calculateReflexion(vec3 n, vec3 o, int spotIndex) {
+
+    Reflexions result = Reflexions(
+        vec3(0),
+        vec3(0)
+    );
+
     vec3 l = normalize(attribIn.lightDir[spotIndex]);
     float dist = length(attribIn.lightDir[spotIndex]);
     float distFactor = min(1.0 / (dist*dist), 1.0);
     float dotProd = dot(n, l);
-    vec3 reflexionColor = vec3(0.0, 0.0, 0.0);
+
     // seulment calucler diffuse et speculaire quand la face est éclairée.
     if (dotProd > 0.0) {
         // Diffuse:
-        reflexionColor += (mat.diffuse * lights[spotIndex].diffuse * dotProd) * distFactor;
+        result.diffuse = (mat.diffuse * lights[spotIndex].diffuse * dotProd) * distFactor;
 
         // Spectulaire:
         // Calculer l'intensité de la réflection spéculaire selon la formule de Blinn ou Phong. Elle dépend de la position de la lumière, de la normale et de la position de l'observateur.
@@ -81,34 +98,47 @@ vec3 calculateReflexion(vec3 n, vec3 o, int spotIndex) {
         // Si le résultat est positif (il y a de la réflexion spéculaire).
         if (specIntensity > 0) {
             float shine = pow(specIntensity, mat.shininess);
-            reflexionColor += (shine * mat.specular * lights[spotIndex].specular) * distFactor;
+            result.specular = (shine * mat.specular * lights[spotIndex].specular) * distFactor;
         }
     }
+
+    // spot:
     if (useSpotlight) {
-        reflexionColor *= calculateSpot(l, n, spotIndex);
+        float spotFactor = calculateSpot(l, n, attribIn.spotDir[spotIndex]);
+        result.diffuse *= spotFactor;
+        result.specular *= spotFactor;
     }
-    return reflexionColor;
+    return result;
 }
 
 void main() {
     vec3 n = normalize(gl_FrontFacing ? attribIn.normal : -attribIn.normal);
     vec3 o = normalize(attribIn.obsPos);
 
-    vec3 emissionColor = mat.emission;
-    vec3 reflexionColor = vec3(0.0, 0.0, 0.0);
-    vec3 ambiantColor = vec3(0.0, 0.0, 0.0);
+    vec3 ambiantI = vec3(0.0, 0.0, 0.0);
+    vec3 diffuseI = vec3(0.0, 0.0, 0.0);
+    vec3 specularI = vec3(0.0, 0.0, 0.0);
+
+    // Emission:
+    vec3 emissionI = mat.emission;
 
     // Ambiant:
-    ambiantColor += mat.ambient * lightModelAmbient;
-    ambiantColor += mat.ambient * lights[0].ambient;
-    ambiantColor += mat.ambient * lights[1].ambient;
-    ambiantColor += mat.ambient * lights[2].ambient;
+    ambiantI += mat.ambient * lightModelAmbient;
+    for (int i = 0; i < 3; i++) {
+        ambiantI += mat.ambient * lights[i].ambient;
+    }
 
-    // diffuse et speculaire
-    reflexionColor += calculateReflexion(n, o, 0);
-    reflexionColor += calculateReflexion(n, o, 1);
-    reflexionColor += calculateReflexion(n, o, 2);
+    // Diffuse & Speculaire:
+    for (int i = 0; i < 3; i++) {
+        Reflexions reflexions = calculateReflexion(n, o, i);
+        diffuseI += reflexions.diffuse;
+        specularI += reflexions.specular;
+    }
 
-    FragColor = vec4(emissionColor + ambiantColor + reflexionColor, 1.0f);
+    vec4 diffuseTexture = texture(diffuseSampler, attribIn.texCoords);
+    if (diffuseTexture.a < 0.3) discard;
+    vec3 diffuseColor = diffuseTexture.xyz * (diffuseI + ambiantI);
+    vec3 specularColor = texture(specularSampler, attribIn.texCoords).xyz * specularI;
+    FragColor = vec4(emissionI + specularColor + diffuseColor, 1.0);
     FragColor = clamp(FragColor, 0.0, 1.0);
 }
