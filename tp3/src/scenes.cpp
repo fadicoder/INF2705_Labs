@@ -113,31 +113,55 @@ void StencilTestScene::render(glm::mat4& view, glm::mat4& projPersp)
 
     m_res.suzanneTexture.use();
     glEnable(GL_STENCIL_TEST);
-    glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
     for (size_t i = 0; i < N_ENEMY_MONKEE; ++i) { // dessiner enemies
         enemyMvp[i] = projView * enemyTransform[i];
         glUniformMatrix4fv(m_res.mvpLocationModel, 1, GL_FALSE, &enemyMvp[i][0][0]);
         // Remplir le stencil en dessinant les singes
-        glStencilFunc(GL_ALWAYS, 2, i);
+        glStencilFunc(GL_ALWAYS, (i + 1) << 2, 0x0c);
         m_res.suzanne.draw();
     }
+    glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
     for (size_t i = 0; i < N_ALLY_MONKEE; ++i) { // dessiner allies
         allyMvp[i] = projView * allyTransform[i];
         glUniformMatrix4fv(m_res.mvpLocationModel, 1, GL_FALSE, &allyMvp[i][0][0]);
         // Remplir le stencil en dessinant les singes
-        glStencilFunc(GL_ALWAYS, 2, i);
+        glStencilFunc(GL_ALWAYS, i + 1, 0x03);
         m_res.suzanne.draw();
     }
+
     glDisable(GL_STENCIL_TEST);
 	
 	// On dessine le ciel un peu plus tôt
     mvp = projPersp * glm::mat4(glm::mat3(view));
     drawSky(mvp);
 
+    // Dessiner les halos
+    glEnable(GL_STENCIL_TEST);
+    m_res.simple.use();
+    glDisable(GL_DEPTH_TEST);
+    for (size_t i = 0; i < N_ALLY_MONKEE; ++i) {
+        glStencilFunc(GL_GREATER, i + 1, 0x03);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+        const glm::vec3 allyColor(0.0f, 0.0f, 1.0f);
+        glUniformMatrix4fv(m_res.mvpLocationSimple, 1, GL_FALSE, &allyMvp[i][0][0]);
+        glUniform3fv(m_res.colorLocationSimple, 1, (float*) &allyColor);
+        m_res.suzanne.draw();
+    }
+    glEnable(GL_DEPTH_TEST);
+    for (size_t i = 0; i < N_ENEMY_MONKEE; ++i) {
+        glStencilFunc(GL_GREATER, 1, 0xff);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+        const glm::vec3 enemyColor(1.0f, 0.0f, 0.0f);
+        glUniformMatrix4fv(m_res.mvpLocationSimple, 1, GL_FALSE, &enemyMvp[i][0][0]);
+        glUniform3fv(m_res.colorLocationSimple, 1, (float*) &enemyColor);
+        m_res.suzanne.draw();
+    }
+    glDisable(GL_STENCIL_TEST);
+
+    // Dessin du mur vitrée
     m_res.model.use();
     m_res.glassTexture.use();
-    
-	// Dessin du mur vitrée
     glDisable(GL_CULL_FACE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -147,27 +171,6 @@ void StencilTestScene::render(glm::mat4& view, glm::mat4& projPersp)
     m_res.glass.draw();
     glEnable(GL_CULL_FACE);
     glDisable(GL_BLEND);
-
-    // Dessiner les halos
-    glEnable(GL_STENCIL_TEST);
-    m_res.simple.use();
-    glStencilFunc(GL_GREATER, 1, 0xff);
-    glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-    for (size_t i = 0; i < N_ENEMY_MONKEE; ++i) {
-        const glm::vec3 enemyColor(1.0f, 0.0f, 0.0f);
-        glUniformMatrix4fv(m_res.mvpLocationSimple, 1, GL_FALSE, &enemyMvp[i][0][0]);
-        glUniform3fv(m_res.colorLocationSimple, 1, (float*) &enemyColor);
-        m_res.suzanne.draw();
-    }
-    glDisable(GL_DEPTH_TEST);
-    for (size_t i = 0; i < N_ALLY_MONKEE; ++i) {
-        const glm::vec3 allyColor(0.0f, 0.0f, 1.0f);
-        glUniformMatrix4fv(m_res.mvpLocationSimple, 1, GL_FALSE, &allyMvp[i][0][0]);
-        glUniform3fv(m_res.colorLocationSimple, 1, (float*) &allyColor);
-        m_res.suzanne.draw();
-    }
-    glEnable(GL_DEPTH_TEST);
-    glDisable(GL_STENCIL_TEST);
     GL_CHECK_ERROR;
 }
 
