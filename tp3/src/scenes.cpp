@@ -140,7 +140,7 @@ void StencilTestScene::render(glm::mat4& view, glm::mat4& projPersp)
     glEnable(GL_STENCIL_TEST);
     m_res.simple.use();
     for (size_t i = 0; i < N_ENEMY_MONKEE; ++i) {
-        glStencilFunc(GL_GREATER, 1, 0xff);
+        glStencilFunc(GL_GREATER, i + 1, 0xff);
         glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
         const glm::vec3 enemyColor(1.0f, 0.0f, 0.0f);
         glUniformMatrix4fv(m_res.mvpLocationSimple, 1, GL_FALSE, &enemyMvp[i][0][0]);
@@ -149,7 +149,7 @@ void StencilTestScene::render(glm::mat4& view, glm::mat4& projPersp)
     }
     glDisable(GL_DEPTH_TEST);
     for (size_t i = 0; i < N_ALLY_MONKEE; ++i) {
-        glStencilFunc(GL_GREATER, 4, 0xff);
+        glStencilFunc(GL_GREATER, (i + 1) << 2, 0xff);
         glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
         const glm::vec3 allyColor(0.0f, 0.0f, 1.0f);
         glUniformMatrix4fv(m_res.mvpLocationSimple, 1, GL_FALSE, &allyMvp[i][0][0]);
