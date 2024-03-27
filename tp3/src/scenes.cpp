@@ -118,7 +118,7 @@ void StencilTestScene::render(glm::mat4& view, glm::mat4& projPersp)
         enemyMvp[i] = projView * enemyTransform[i];
         glUniformMatrix4fv(m_res.mvpLocationModel, 1, GL_FALSE, &enemyMvp[i][0][0]);
         // Remplir le stencil en dessinant les singes
-        glStencilFunc(GL_ALWAYS, (i + 1) << 2, 0x0c);
+        glStencilFunc(GL_ALWAYS, i + 1, 0x03); // 1, 2 ou 3
         m_res.suzanne.draw();
     }
     glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
@@ -126,7 +126,7 @@ void StencilTestScene::render(glm::mat4& view, glm::mat4& projPersp)
         allyMvp[i] = projView * allyTransform[i];
         glUniformMatrix4fv(m_res.mvpLocationModel, 1, GL_FALSE, &allyMvp[i][0][0]);
         // Remplir le stencil en dessinant les singes
-        glStencilFunc(GL_ALWAYS, i + 1, 0x03);
+        glStencilFunc(GL_ALWAYS, (i + 1) << 2, 0x0c); // 4, 8 ou 12
         m_res.suzanne.draw();
     }
 
@@ -139,16 +139,6 @@ void StencilTestScene::render(glm::mat4& view, glm::mat4& projPersp)
     // Dessiner les halos
     glEnable(GL_STENCIL_TEST);
     m_res.simple.use();
-    glDisable(GL_DEPTH_TEST);
-    for (size_t i = 0; i < N_ALLY_MONKEE; ++i) {
-        glStencilFunc(GL_GREATER, i + 1, 0x03);
-        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-        const glm::vec3 allyColor(0.0f, 0.0f, 1.0f);
-        glUniformMatrix4fv(m_res.mvpLocationSimple, 1, GL_FALSE, &allyMvp[i][0][0]);
-        glUniform3fv(m_res.colorLocationSimple, 1, (float*) &allyColor);
-        m_res.suzanne.draw();
-    }
-    glEnable(GL_DEPTH_TEST);
     for (size_t i = 0; i < N_ENEMY_MONKEE; ++i) {
         glStencilFunc(GL_GREATER, 1, 0xff);
         glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
@@ -157,6 +147,16 @@ void StencilTestScene::render(glm::mat4& view, glm::mat4& projPersp)
         glUniform3fv(m_res.colorLocationSimple, 1, (float*) &enemyColor);
         m_res.suzanne.draw();
     }
+    glDisable(GL_DEPTH_TEST);
+    for (size_t i = 0; i < N_ALLY_MONKEE; ++i) {
+        glStencilFunc(GL_GREATER, 4, 0xff);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+        const glm::vec3 allyColor(0.0f, 0.0f, 1.0f);
+        glUniformMatrix4fv(m_res.mvpLocationSimple, 1, GL_FALSE, &allyMvp[i][0][0]);
+        glUniform3fv(m_res.colorLocationSimple, 1, (float*) &allyColor);
+        m_res.suzanne.draw();
+    }
+    glEnable(GL_DEPTH_TEST);
     glDisable(GL_STENCIL_TEST);
 
     // Dessin du mur vitrée
