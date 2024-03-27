@@ -140,7 +140,7 @@ void StencilTestScene::render(glm::mat4& view, glm::mat4& projPersp)
 	// Dessin du mur vitrée
     glDisable(GL_CULL_FACE);
     glEnable(GL_BLEND);
-    glBlendFunc(GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glm::mat4 mirrorMatrix = glm::translate(glm::mat4(1.0f), {0, -1, 0});
     mvp = projView * mirrorMatrix;
     glUniformMatrix4fv(m_res.mvpLocationModel, 1, GL_FALSE, &mvp[0][0]);
