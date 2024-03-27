@@ -135,7 +135,7 @@ void main() {
     attribOut.diffuse = vec3(0.0, 0.0, 0.0);
     vec3 o = normalize(-pos);
     for (int j = 0; j < 3; j++) {
-        vec3 lightDirection = (modelView * vec4(lights[j].position, 1.0f)).xyz - pos;
+        vec3 lightDirection = (view * vec4(lights[j].position, 1.0f)).xyz - pos;
         vec3 spotDirection = mat3(view) * -lights[j].spotDirection;
         Reflexions reflexions = calculateReflexion(normal, o, lightDirection, spotDirection, j);
         attribOut.diffuse += reflexions.diffuse;

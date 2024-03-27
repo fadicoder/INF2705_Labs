@@ -132,8 +132,8 @@ void main() {
     attribOut.diffuse = vec3(0.0, 0.0, 0.0);
     attribOut.specular = vec3(0.0, 0.0, 0.0);
     for (int i = 0; i < 3; i++) {
-        vec3 lightDir = (modelView * vec4(lights[i].position, 1.0f)).xyz - pos;
-        vec3 spotDir = mat3(modelView) * -lights[i].spotDirection;
+        vec3 lightDir = (view * vec4(lights[i].position, 1.0f)).xyz - pos;
+        vec3 spotDir = mat3(view) * -lights[i].spotDirection;
         Reflexions reflexions = calculateReflexion(transformedNormal, normalize(obsPos), lightDir, spotDir, i);
         attribOut.diffuse += reflexions.diffuse;
         attribOut.specular += reflexions.specular;
