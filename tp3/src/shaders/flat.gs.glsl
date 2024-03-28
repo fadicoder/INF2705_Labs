@@ -66,7 +66,7 @@ float calculateSpot(vec3 l, vec3 n, vec3 spotDirectin) {
         if (dotProduct > cos(radians(spotOpeningAngle))) {
             if (useDirect3D) {
                 float cosInner = cos(radians(spotOpeningAngle));
-                float cosOuter = pow(cosInner, 1.01 + (spotExponent / 2));
+                float cosOuter = pow(cosInner, 1.01 + (spotExponent / 2.0));
                 spotFacteur = smoothstep(cosOuter, cosInner, dotProduct);
             } else {
                 spotFacteur = pow(dotProduct, spotExponent);

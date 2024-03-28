@@ -141,12 +141,33 @@ void StencilTestScene::render(glm::mat4& view, glm::mat4& projPersp)
     m_res.simple.use();
     for (size_t i = 0; i < N_ENEMY_MONKEE; ++i) {
         glStencilFunc(GL_GREATER, i + 1, 0xff);
-        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+        glStencilOp(GL_KEEP, GL_ZERO, GL_KEEP);
         const glm::vec3 enemyColor(1.0f, 0.0f, 0.0f);
         glUniformMatrix4fv(m_res.mvpLocationSimple, 1, GL_FALSE, &enemyMvp[i][0][0]);
         glUniform3fv(m_res.colorLocationSimple, 1, (float*) &enemyColor);
         m_res.suzanne.draw();
     }
+    glDisable(GL_STENCIL_TEST);
+
+    // Dessin du mur vitré
+    // On sait que cela fait des changements de contexte de plus,
+    // mais c'est pour avoir le halo bleu à travers le cadre de la vitre
+    // et avoir le halo rouge à travers la vitre colorée
+    m_res.model.use();
+    m_res.glassTexture.use();
+    glDisable(GL_CULL_FACE);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glm::mat4 mirrorMatrix = glm::translate(glm::mat4(1.0f), {0, -1, 0});
+    mvp = projView * mirrorMatrix;
+    glUniformMatrix4fv(m_res.mvpLocationModel, 1, GL_FALSE, &mvp[0][0]);
+    m_res.glass.draw();
+    glEnable(GL_CULL_FACE);
+    glDisable(GL_BLEND);
+
+    m_res.suzanneTexture.use();
+    m_res.simple.use();
+    glEnable(GL_STENCIL_TEST);
     glDisable(GL_DEPTH_TEST);
     for (size_t i = 0; i < N_ALLY_MONKEE; ++i) {
         glStencilFunc(GL_GREATER, (i + 1) << 2, 0xff);
@@ -159,18 +180,6 @@ void StencilTestScene::render(glm::mat4& view, glm::mat4& projPersp)
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_STENCIL_TEST);
 
-    // Dessin du mur vitrée
-    m_res.model.use();
-    m_res.glassTexture.use();
-    glDisable(GL_CULL_FACE);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glm::mat4 mirrorMatrix = glm::translate(glm::mat4(1.0f), {0, -1, 0});
-    mvp = projView * mirrorMatrix;
-    glUniformMatrix4fv(m_res.mvpLocationModel, 1, GL_FALSE, &mvp[0][0]);
-    m_res.glass.draw();
-    glEnable(GL_CULL_FACE);
-    glDisable(GL_BLEND);
     GL_CHECK_ERROR;
 }
 

@@ -64,7 +64,7 @@ float calculateSpot(vec3 l, vec3 n, vec3 spotDirection) {
         if (dotProduct > cos(radians(spotOpeningAngle))) {
             if (useDirect3D) {
                 float cosInner = cos(radians(spotOpeningAngle));
-                float cosOuter = pow(cosInner, 1.01 + (spotExponent / 2));
+                float cosOuter = pow(cosInner, 1.01 + (spotExponent / 2.0));
                 spotFacteur = smoothstep(cosOuter, cosInner, dotProduct);
             } else {
                 spotFacteur = pow(dotProduct, spotExponent);
@@ -104,7 +104,7 @@ Reflexions calculateReflexion(vec3 n, vec3 o, int spotIndex) {
 
     // spot:
     if (useSpotlight) {
-        float spotFactor = calculateSpot(l, n, normalize(attribIn.spotDir[spotIndex]));
+        float spotFactor = calculateSpot(l, n, attribIn.spotDir[spotIndex]);
         result.diffuse *= spotFactor;
         result.specular *= spotFactor;
     }
