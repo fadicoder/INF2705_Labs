@@ -35,10 +35,10 @@ void main()
     a2 = modelView * a2;
     a3 = modelView * a3;
 
-    float d0 = clamp((MIN_DIST - distance(a0, vec4(0)) / (MAX_DIST - MIN_DIST)), 0, 1);
-    float d1 = clamp((MIN_DIST - distance(a1, vec4(0)) / (MAX_DIST - MIN_DIST)), 0, 1);
-    float d2 = clamp((MIN_DIST - distance(a2, vec4(0)) / (MAX_DIST - MIN_DIST)), 0, 1);
-    float d3 = clamp((MIN_DIST - distance(a3, vec4(0)) / (MAX_DIST - MIN_DIST)), 0, 1);
+    float d0 = clamp(((MIN_DIST - distance(a0, vec4(0))) / (MAX_DIST - MIN_DIST)), 0, 1);
+    float d1 = clamp(((MIN_DIST - distance(a1, vec4(0))) / (MAX_DIST - MIN_DIST)), 0, 1);
+    float d2 = clamp(((MIN_DIST - distance(a2, vec4(0))) / (MAX_DIST - MIN_DIST)), 0, 1);
+    float d3 = clamp(((MIN_DIST - distance(a3, vec4(0))) / (MAX_DIST - MIN_DIST)), 0, 1);
 
     float t0 = mix(MIN_TESS, MAX_TESS, d0);
     float t1 = mix(MIN_TESS, MAX_TESS, d1);

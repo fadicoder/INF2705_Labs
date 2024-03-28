@@ -22,7 +22,7 @@ void main()
 {
     for (int i = 0; i < 4; i++) {
         attribOut.color = attribIn[i].color;
-        attribOut.texCoords = attribIn[i].size * projection;
+        attribOut.texCoords = attribIn[i].size;
         EmitVertex();
     }
 }
