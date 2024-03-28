@@ -35,9 +35,9 @@ void Scene::drawSky(glm::mat4& mvp)
 
 TesselationScene::TesselationScene(Resources& resources)
 : Scene(resources)
-, m_viewWireframe(0)
+, m_viewWireframe(false)
 {
-    // TODO
+    glPatchParameteri(GL_PATCH_VERTICES, 4);
 }
 
 TesselationScene::~TesselationScene()
@@ -66,11 +66,12 @@ void TesselationScene::render(glm::mat4& view, glm::mat4& projPersp)
 
     glUniform1i(m_res.viewWireframeLocationTessellation, m_viewWireframe);
 
-	// TODO: To remove, only for debug
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);//GL_FILL
-	
+//	// TODO: To remove, only for debug
+//    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);//GL_FILL
+
 	// TODO
-    //m_res.tesselationPlane.draw(, m_res.tesselationPlaneCount);
+    GL_CHECK_ERROR;
+    m_res.tesselationPlane.draw(GL_PATCHES, m_res.tesselationPlaneCount);
 
     mvp = projPersp * glm::mat4(glm::mat3(view));
     drawSky(mvp);

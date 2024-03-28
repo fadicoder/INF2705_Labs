@@ -21,5 +21,11 @@ out ATTRIB_GS_OUT
 
 void main()
 {
-    // TODO
+    for (int i = 0; i < 3; i++) {
+        attribOut.texCoords = attribIn[i].texCoords;
+        attribOut.height = attribIn[i].height;
+        attribOut.patchDistance = attribIn[i].patchDistance;
+        attribOut.barycentricCoords = vec3(0);
+        EmitVertex();
+    }
 }

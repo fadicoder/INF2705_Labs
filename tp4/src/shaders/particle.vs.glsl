@@ -16,5 +16,6 @@ out ATTRIB_VS_OUT
 
 void main()
 {
-    // TODO
+    attribOut.size = size;
+    attribOut.color = color;
 }

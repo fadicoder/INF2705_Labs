@@ -13,5 +13,7 @@ in ATTRIB_GS_OUT
 
 void main()
 {
-    // TODO
+    vec4 texel = texture(textureSampler, attribIn.texCoords.st);
+    if (texel.a < 0.05) discard;
+    FragColor = texel.rgba + attribIn.color;
 }

@@ -20,5 +20,9 @@ uniform mat4 projection;
 
 void main()
 {
-    // TODO
+    for (int i = 0; i < 4; i++) {
+        attribOut.color = attribIn[i].color;
+        attribOut.texCoords = attribIn[i].size * projection;
+        EmitVertex();
+    }
 }
