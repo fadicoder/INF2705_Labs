@@ -34,12 +34,19 @@ void main() {
     vec4 p2 = gl_in[2].gl_Position;
     vec4 p3 = gl_in[3].gl_Position;
 
-    vec2 pos_2d = interpole(p0, p1, p2, p3);
-    float height = texture(heighmapSampler, pos_2d / 4.0).x;
-    vec4 pos = vec4(pos_2d, (height * 64.0) - 32.0, 1.0f);
+    vec2 interpoled_pos = interpole(p0, p1, p2, p3);
+    vec2 pos_2d = (interpoled_pos / PLANE_SIZE) + vec2(0.5);
+    float z = texture(heighmapSampler, pos_2d / 4.0).x;
 
+    float MAX_HEIGHT = 32.0;
+    vec4 pos = vec4(interpoled_pos.x, interpoled_pos.y, (z * MAX_HEIGHT * 2) - MAX_HEIGHT, 1.0f);
     gl_Position = mvp * pos;
-    attribOut.height = height;
+
+    attribOut.height = z;
     attribOut.texCoords = (gl_TessCoord * 2).xy;
-    attribOut.patchDistance = vec4(gl_TessCoord.x, gl_TessCoord.y, 1.0 - gl_TessCoord.x, 1.0 - gl_TessCoord.y);
+    attribOut.patchDistance = vec4(
+        gl_TessCoord.x,
+        gl_TessCoord.y,
+        1.0 - gl_TessCoord.x,
+        1.0 - gl_TessCoord.y);
 }
