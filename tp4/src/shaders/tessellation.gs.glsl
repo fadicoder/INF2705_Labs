@@ -22,7 +22,7 @@ out ATTRIB_GS_OUT
 void main()
 {
     // TODO
-    for (int i = 0; i < gl_PatchVerticesIn; i++) {
+    for (int i = 0; i < 2; i++) {
         // utilisant la position interpolée et en la conver-
         //tissant dans un intervalle [0, 1] avec la taille du plan complet (prenez note que celui-ci est centré
         //en (0, 0)). De plus, on divisera les coordonnées par 4 pour étirer la texture sur le plan et réduire la

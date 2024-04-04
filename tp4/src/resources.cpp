@@ -92,7 +92,6 @@ Resources::Resources()
         std::string tessEvalCode = readFile("shaders/tessellation.tes.glsl");
         std::string geometryCode = readFile("shaders/tessellation.gs.glsl");
         std::string fragmentCode = readFile("shaders/tessellation.fs.glsl");
-
         Shader vertex(GL_VERTEX_SHADER, vertexCode.c_str());
         Shader tessControl(GL_TESS_CONTROL_SHADER, tessCtrlCode.c_str());
         Shader tessEvaluation(GL_TESS_EVALUATION_SHADER, tessEvalCode.c_str());
