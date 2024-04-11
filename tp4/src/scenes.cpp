@@ -17,10 +17,7 @@ Scene::Scene(Resources& resources)
 
 }
 
-Scene::~Scene()
-{
-
-}
+Scene::~Scene() = default;
 
 void Scene::drawSky(glm::mat4& mvp)
 {
@@ -40,10 +37,7 @@ TesselationScene::TesselationScene(Resources& resources)
     glPatchParameteri(GL_PATCH_VERTICES, 4);
 }
 
-TesselationScene::~TesselationScene()
-{
-
-}
+TesselationScene::~TesselationScene() = default;
 
 void TesselationScene::render(glm::mat4& view, glm::mat4& projPersp)
 {
@@ -66,11 +60,6 @@ void TesselationScene::render(glm::mat4& view, glm::mat4& projPersp)
 
     glUniform1i(m_res.viewWireframeLocationTessellation, m_viewWireframe);
 
-//	// TODO: To remove, only for debug
-//    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);//GL_FILL
-
-	// TODO
-    GL_CHECK_ERROR;
     m_res.tesselationPlane.draw(GL_PATCHES, m_res.tesselationPlaneCount);
 
     mvp = projPersp * glm::mat4(glm::mat3(view));

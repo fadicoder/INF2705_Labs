@@ -27,6 +27,7 @@ OBJ = $(addprefix $(BUILD)/, $(notdir $(SRC:.cpp=.o)))
 
 all: run
 
+all: run
 exe : $(EXE)
 run : exe
 	$(EXE)
