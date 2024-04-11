@@ -29,17 +29,17 @@ vec2 interpole( vec2 v0, vec2 v1, vec2 v2, vec2 v3 ) { // L'interpolation est se
 const float PLANE_SIZE = 256.0f;
 
 void main() {
-    vec2 p0 = gl_in[0].gl_Position.xy;
-    vec2 p1 = gl_in[1].gl_Position.xy;
-    vec2 p2 = gl_in[2].gl_Position.xy;
-    vec2 p3 = gl_in[3].gl_Position.xy;
+    vec2 p0 = gl_in[0].gl_Position.xz;
+    vec2 p1 = gl_in[1].gl_Position.xz;
+    vec2 p2 = gl_in[2].gl_Position.xz;
+    vec2 p3 = gl_in[3].gl_Position.xz;
 
     vec2 interpoled_pos = clamp(interpole(p0, p1, p2, p3), -PLANE_SIZE/2.0, PLANE_SIZE/2.0); // On s'assure que la coordonnée de monde est dans le plain
     vec2 pos_2d = (interpoled_pos / PLANE_SIZE) + vec2(0.5); // Transformer la coordonnée de monde pour être entre 0 et 1
     float z = texture(heighmapSampler, pos_2d / 4.0).x; // Si on utilise gl_TessCoord au lieu de pos_2d/4.0 ca donne un meilleur résultat
 
     float MAX_HEIGHT = 32.0;
-    vec4 pos = vec4(interpoled_pos.x, interpoled_pos.y, (z * MAX_HEIGHT * 2) - MAX_HEIGHT, 1.0f);
+    vec4 pos = vec4(interpoled_pos.x, (z * MAX_HEIGHT * 2) - MAX_HEIGHT, interpoled_pos.y, 1.0f);
     gl_Position = mvp * pos;
 
     attribOut.height = z;

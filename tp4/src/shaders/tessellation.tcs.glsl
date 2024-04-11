@@ -16,7 +16,7 @@ void main()
 {
     gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
 
-    if (gl_InvocationID == 0) { // Ce if est just une optimisation ca change rien si on l'enlève
+    if (gl_InvocationID == 0) {
 
         vec4 p0 = gl_in[0].gl_Position; // (0,0)
         vec4 p1 = gl_in[1].gl_Position; // (1,0)

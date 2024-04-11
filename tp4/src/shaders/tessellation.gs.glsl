@@ -21,7 +21,7 @@ out ATTRIB_GS_OUT
 
 void main()
 {
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < gl_in.length(); i++) {
         attribOut.texCoords = attribIn[i].texCoords;
         attribOut.height = attribIn[i].height;
         attribOut.patchDistance = attribIn[i].patchDistance;
