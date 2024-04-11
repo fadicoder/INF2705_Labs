@@ -44,10 +44,10 @@ void main()
         float d2 = clamp(((distance(a2, vec4(0)) - MIN_DIST) / (MAX_DIST - MIN_DIST)), 0, 1);
         float d3 = clamp(((distance(a3, vec4(0)) - MIN_DIST) / (MAX_DIST - MIN_DIST)), 0, 1);
 
-        float t0 = mix(MIN_TESS, MAX_TESS, d0);
-        float t1 = mix(MIN_TESS, MAX_TESS, d1);
-        float t2 = mix(MIN_TESS, MAX_TESS, d2);
-        float t3 = mix(MIN_TESS, MAX_TESS, d3);
+        float t0 = mix(MAX_TESS, MIN_TESS, d0);
+        float t1 = mix(MAX_TESS, MIN_TESS, d1);
+        float t2 = mix(MAX_TESS, MIN_TESS, d2);
+        float t3 = mix(MAX_TESS, MIN_TESS, d3);
 
         gl_TessLevelOuter[0] = t0;
         gl_TessLevelOuter[1] = t1;

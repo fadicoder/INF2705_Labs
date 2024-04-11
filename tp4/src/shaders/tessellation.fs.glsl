@@ -37,5 +37,33 @@ const float PATCH_EDGE_WIDTH = 0.5f;
 
 void main()
 {
-	FragColor = vec4(attribIn.height, 0.0, 0.0, 1.0);
+    vec4 color = vec4(1.0);
+
+    if (attribIn.height < 0.3){
+        color = texture(sandSampler, attribIn.texCoords).rgba;
+    } else if (attribIn.height < 0.35){
+        vec4 sand = texture(sandSampler, attribIn.texCoords).rgba;
+        vec4 ground = texture(groundSampler, attribIn.texCoords).rgba;
+        color = mix(sand, ground, smoothstep(0.3, 0.35, attribIn.height)); // melange de sand et de ground
+    } else if (attribIn.height < 0.6 ){
+        color = texture(groundSampler, attribIn.texCoords).rgba;
+    } else if (attribIn.height < 0.65){
+        vec4 ground = texture(groundSampler, attribIn.texCoords).rgba;
+        vec4 snow = texture(snowSampler, attribIn.texCoords).rgba;
+        color = mix(ground, snow, smoothstep(0.6, 0.65, attribIn.height)); // melange de sand et de ground
+    } else {
+        color = texture(snowSampler, attribIn.texCoords).rgba;
+    }
+    FragColor = color;
+
+    if (viewWireframe) {
+        float factor = edgeFactor(attribIn.barycentricCoords, WIREFRAME_WIDTH);
+        if (factor == 0) {
+            FragColor = vec4(mix(WIREFRAME_COLOR, color.xyz, 0.5), 1.0f);
+        }
+        factor = edgeFactor(attribIn.patchDistance, PATCH_EDGE_WIDTH);
+        if (factor == 0) {
+            FragColor = vec4(PATCH_EDGE_COLOR, 1.0f);
+        }
+    }
 }
