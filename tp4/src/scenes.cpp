@@ -149,7 +149,8 @@ void ParticleScene::render(glm::mat4& view, glm::mat4& projPersp)
 
     m_res.transformFeedback.use();
     
-    // TODO: buffer binding
+    // buffer binding
+    glBindVertexArray(m_vao);
 
     glUniform1f(m_res.timeLocationTransformFeedback, time);
     glUniform1f(m_res.dtLocationTransformFeedback, dt);
@@ -158,7 +159,8 @@ void ParticleScene::render(glm::mat4& view, glm::mat4& projPersp)
     glDrawBuffer(GL_POINTS);
     GL_CHECK_ERROR;
 
-    // TODO: swap buffers
+    // swap buffers
+    this->m_w.swap();
 
     // Draw skybox first without the function to change some parameter on the depth test.
     glDepthFunc(GL_LEQUAL);
