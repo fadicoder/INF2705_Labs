@@ -140,8 +140,14 @@ Resources::Resources()
         Shader vertex(GL_VERTEX_SHADER, vertexCode.c_str());
         transformFeedback.attachShader(vertex);
 
-		// TODO
-
+        const GLchar * names[] = {
+                "positionMod",
+                "velocityMod",
+                "colorMod",
+                "sizeMod",
+                "timeToLiveMod"
+        };
+        transformFeedback.setTransformFeedbackVaryings(names, 5, GL_INTERLEAVED_ATTRIBS);
         transformFeedback.link();
 
         timeLocationTransformFeedback = transformFeedback.getUniformLoc("time");

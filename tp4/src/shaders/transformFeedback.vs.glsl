@@ -58,5 +58,9 @@ const vec3 ACCELERATION = vec3(0.0f, 0.1f, 0.0f);
 
 void main()
 {
-    // TODO   
+    positionMod = vec3(0);
+    velocityMod = vec3(0);
+    colorMod = vec4(0);
+    sizeMod = vec2(0);
+    timeToLiveMod = 0;
 }
