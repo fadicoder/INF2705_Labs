@@ -15,5 +15,5 @@ void main()
 {
     vec4 texel = texture(textureSampler, attribIn.texCoords.st);
     if (texel.a < 0.05) discard;
-    FragColor = texel.rgba + attribIn.color;
+    FragColor = clamp(texel.rgba + attribIn.color, 0.0, 1.0);
 }

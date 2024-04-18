@@ -121,7 +121,7 @@ ParticleScene::ParticleScene(Resources& resources, Window& w)
 
     glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, 13 * sizeof(float),  (GLvoid*) (sizeof(float) * 12));
     glEnableVertexAttribArray(4);
-    glBindBuffer(GL_ARRAY_BUFFER, this->m_vbo[0]);
+    glBindBuffer(GL_ARRAY_BUFFER, this->m_vbo[1]);
     glBufferData(GL_ARRAY_BUFFER, MAX_N_PARTICULES * sizeof(Particle), nullptr, GL_DYNAMIC_COPY);
     glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, this->m_tfo);
     GL_CHECK_ERROR;
