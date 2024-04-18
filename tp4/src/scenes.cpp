@@ -192,7 +192,7 @@ void ParticleScene::render(glm::mat4& view, glm::mat4& projPersp)
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    glDrawBuffer(GL_STREAM_DRAW);
+    glDrawBuffer(GL_POINTS);
     GL_CHECK_ERROR;
 
     glDisable(GL_BLEND);
