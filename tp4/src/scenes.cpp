@@ -96,11 +96,10 @@ ParticleScene::ParticleScene(Resources& resources, Window& w)
     GL_CHECK_ERROR;
     glGenBuffers(2, this->m_vbo);
     GL_CHECK_ERROR;
-    glGenQueries(1, &m_nParticles);
     glGenTransformFeedbacks(1, &m_tfo);
     GL_CHECK_ERROR;
     glBindBuffer(GL_ARRAY_BUFFER, this->m_vbo[0]);
-    glBufferData(GL_ARRAY_BUFFER, MAX_N_PARTICULES * sizeof(Particle), particles, GL_DYNAMIC_COPY);
+    glBufferData(GL_ARRAY_BUFFER, MAX_N_PARTICULES * sizeof(Particle), particles, GL_STATIC_DRAW);
     GL_CHECK_ERROR;
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 13 * sizeof(float),  (GLvoid*) nullptr);
@@ -122,7 +121,7 @@ ParticleScene::ParticleScene(Resources& resources, Window& w)
     glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, 13 * sizeof(float),  (GLvoid*) (sizeof(float) * 12));
     glEnableVertexAttribArray(4);
     glBindBuffer(GL_ARRAY_BUFFER, this->m_vbo[1]);
-    glBufferData(GL_ARRAY_BUFFER, MAX_N_PARTICULES * sizeof(Particle), nullptr, GL_DYNAMIC_COPY);
+    glBufferData(GL_ARRAY_BUFFER, MAX_N_PARTICULES * sizeof(Particle), nullptr, GL_STATIC_READ);
     glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, this->m_tfo);
     GL_CHECK_ERROR;
 }
@@ -131,6 +130,7 @@ ParticleScene::~ParticleScene()
 {
     glDeleteBuffers(2, this->m_vbo);
     glDeleteVertexArrays(1, &this->m_vao);
+    glDeleteTransformFeedbacks(1, &this->m_tfo);
     glDisable(GL_PROGRAM_POINT_SIZE);
 }
 
@@ -151,43 +151,42 @@ void ParticleScene::render(glm::mat4& view, glm::mat4& projPersp)
     
     // buffer binding
     glBindVertexArray(m_vao);
-
+    glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_tfo);
+    glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0,m_vbo[1]);
+    glBindBuffer(GL_ARRAY_BUFFER, m_vbo[0]);
     glUniform1f(m_res.timeLocationTransformFeedback, time);
     glUniform1f(m_res.dtLocationTransformFeedback, dt);
 
     // update particles
-    glDrawBuffer(GL_POINTS);
+    glEnable(GL_RASTERIZER_DISCARD);
+    glBeginTransformFeedback(GL_POINTS);
+    glDrawArrays(GL_POINTS, 0, MAX_N_PARTICULES);
+    glEndTransformFeedback();
+    glDisable(GL_RASTERIZER_DISCARD);
     GL_CHECK_ERROR;
 
     // swap buffers
-    this->m_w.swap();
+    m_w.swap();
 
     // Draw skybox first without the function to change some parameter on the depth test.
-    glDepthFunc(GL_LEQUAL);
     glDepthMask(GL_FALSE);
-    m_res.skyboxShader.use();
-    m_res.skyboxTexture.use();
     mvp = projPersp * glm::mat4(glm::mat3(view));
-    glUniformMatrix4fv(m_res.mvpLocationSky, 1, GL_FALSE, &mvp[0][0]);
-    m_res.skybox.draw(GL_TRIANGLES, 6 * 6);
+    drawSky(mvp);
     glDepthMask(GL_TRUE);
-    glDepthFunc(GL_LESS);
 
 
     m_res.particule.use();
-
     m_res.flameTexture.use();
 
     // TODO: buffer binding
     glBindVertexArray(this->m_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, this->m_vbo[1]);
 
     modelView = view;
     glUniformMatrix4fv(m_res.modelViewLocationParticle, 1, GL_FALSE, &modelView[0][0]);
     glUniformMatrix4fv(m_res.projectionLocationParticle, 1, GL_FALSE, &projPersp[0][0]);
 
     // TODO: Draw particles without depth write and with blending
-    m_res.particule.use();
-    m_res.flameTexture.use();
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -204,5 +203,5 @@ void ParticleScene::render(glm::mat4& view, glm::mat4& projPersp)
         m_cumulativeTime = 0.0f;
         if (++m_nParticles > m_nMaxParticles)
             m_nParticles = m_nMaxParticles;
-    }    
+    }
 }
