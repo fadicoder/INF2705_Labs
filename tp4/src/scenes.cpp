@@ -76,7 +76,7 @@ void TesselationScene::drawMenu()
 }
 
 
-static const unsigned int MAX_N_PARTICULES = 10000;
+static const unsigned int MAX_N_PARTICULES = 1;
 static Particle particles[MAX_N_PARTICULES] = { {{0,0,0},{0,0,0},{0,0,0,0}, {0,0},0} };
 
 ParticleScene::ParticleScene(Resources& resources, Window& w)
@@ -88,39 +88,31 @@ ParticleScene::ParticleScene(Resources& resources, Window& w)
 , m_nMaxParticles(1000)
 {
     glEnable(GL_PROGRAM_POINT_SIZE);
-    GL_CHECK_ERROR;
 
-    glGenVertexArrays(1, &this->m_vao);
-    GL_CHECK_ERROR;
-    glBindVertexArray(this->m_vao);
-    GL_CHECK_ERROR;
-    glGenBuffers(2, this->m_vbo);
-    GL_CHECK_ERROR;
+    glGenVertexArrays(1, &m_vao);
+    glBindVertexArray(m_vao);
+    glGenBuffers(2, m_vbo);
     glGenTransformFeedbacks(1, &m_tfo);
-    GL_CHECK_ERROR;
-    glBindBuffer(GL_ARRAY_BUFFER, this->m_vbo[0]);
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_vbo[0]);
     glBufferData(GL_ARRAY_BUFFER, MAX_N_PARTICULES * sizeof(Particle), particles, GL_STATIC_DRAW);
-    GL_CHECK_ERROR;
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 13 * sizeof(float),  (GLvoid*) nullptr);
     glEnableVertexAttribArray(0);
-    GL_CHECK_ERROR;
 
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 13 * sizeof(float),  (GLvoid*) (sizeof(float) * 3));
     glEnableVertexAttribArray(1);
-    GL_CHECK_ERROR;
 
     glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 13 * sizeof(float),  (GLvoid*) (sizeof(float) * 6));
     glEnableVertexAttribArray(2);
-    GL_CHECK_ERROR;
 
     glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 13 * sizeof(float),  (GLvoid*) (sizeof(float) * 10));
     glEnableVertexAttribArray(3);
-    GL_CHECK_ERROR;
 
     glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, 13 * sizeof(float),  (GLvoid*) (sizeof(float) * 12));
     glEnableVertexAttribArray(4);
-    glBindBuffer(GL_ARRAY_BUFFER, this->m_vbo[1]);
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_vbo[1]);
     glBufferData(GL_ARRAY_BUFFER, MAX_N_PARTICULES * sizeof(Particle), nullptr, GL_STATIC_READ);
     glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, this->m_tfo);
     GL_CHECK_ERROR;
@@ -128,9 +120,9 @@ ParticleScene::ParticleScene(Resources& resources, Window& w)
 
 ParticleScene::~ParticleScene()
 {
-    glDeleteBuffers(2, this->m_vbo);
-    glDeleteVertexArrays(1, &this->m_vao);
-    glDeleteTransformFeedbacks(1, &this->m_tfo);
+    glDeleteBuffers(2, m_vbo);
+    glDeleteVertexArrays(1, &m_vao);
+    glDeleteTransformFeedbacks(1, &m_tfo);
     glDisable(GL_PROGRAM_POINT_SIZE);
 }
 
@@ -152,10 +144,10 @@ void ParticleScene::render(glm::mat4& view, glm::mat4& projPersp)
     // buffer binding
     glBindVertexArray(m_vao);
     glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_tfo);
-    glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0,m_vbo[1]);
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo[0]);
     glUniform1f(m_res.timeLocationTransformFeedback, time);
     glUniform1f(m_res.dtLocationTransformFeedback, dt);
+    glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0,m_vbo[1]);
 
     // update particles
     glEnable(GL_RASTERIZER_DISCARD);
@@ -163,7 +155,6 @@ void ParticleScene::render(glm::mat4& view, glm::mat4& projPersp)
     glDrawArrays(GL_POINTS, 0, MAX_N_PARTICULES);
     glEndTransformFeedback();
     glDisable(GL_RASTERIZER_DISCARD);
-    GL_CHECK_ERROR;
 
     // swap buffers
     m_w.swap();
@@ -181,7 +172,6 @@ void ParticleScene::render(glm::mat4& view, glm::mat4& projPersp)
     // TODO: buffer binding
     glBindVertexArray(this->m_vao);
     glBindBuffer(GL_ARRAY_BUFFER, this->m_vbo[1]);
-
     modelView = view;
     glUniformMatrix4fv(m_res.modelViewLocationParticle, 1, GL_FALSE, &modelView[0][0]);
     glUniformMatrix4fv(m_res.projectionLocationParticle, 1, GL_FALSE, &projPersp[0][0]);
@@ -192,7 +182,6 @@ void ParticleScene::render(glm::mat4& view, glm::mat4& projPersp)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glDrawBuffer(GL_POINTS);
-    GL_CHECK_ERROR;
 
     glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);

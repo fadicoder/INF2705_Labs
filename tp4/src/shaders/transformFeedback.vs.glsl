@@ -89,7 +89,7 @@ void main()
         nextColor = smoothstep(YELLOW_COLOR, ORANGE_COLOR, vec3(timeToLiveNormalised));
     } else if (timeToLiveNormalised < 0.5) {
         nextColor = ORANGE_COLOR;
-    }else {
+    } else {
         nextColor = smoothstep(ORANGE_COLOR, DARK_RED_COLOR, vec3(timeToLiveNormalised));
     }
     float alpha = smoothstep(0.0, 0.2, color.a) * 1 - smoothstep(0.8, 1, color.a);
