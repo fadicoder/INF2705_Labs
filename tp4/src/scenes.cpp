@@ -157,7 +157,7 @@ void ParticleScene::render(glm::mat4& view, glm::mat4& projPersp)
     glDisable(GL_RASTERIZER_DISCARD);
 
     // swap buffers
-    m_w.swap();
+    std::swap(m_vbo[0], m_vbo[1]);
 
     // Draw skybox first without the function to change some parameter on the depth test.
     glDepthFunc(GL_LEQUAL);
