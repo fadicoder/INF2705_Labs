@@ -22,14 +22,12 @@ void main()
 {
     vec2 positions[4] = vec2[4](vec2(-1.0, -1.0), vec2(-1.0, 1.0), vec2(1.0, -1.0), vec2(1.0, 1.0));
     vec2 texPositions[4] = vec2[4](vec2(0.0, 0.0), vec2(0.0, 1.0), vec2(1.0, 0.0), vec2(1.0, 1.0));
-    for (int i = 0; i < gl_in.length(); i++) {
-        for (int j = 0; j < 4; j++) {
-            vec3 pos = vec3(gl_in[i].gl_Position.xy + ((attribIn[i].size * positions[j] * 0.5)), gl_in[i].gl_Position.z);
-            gl_Position = projection * vec4(pos, 1.0);
+    for (int j = 0; j < 4; j++) {
+        vec3 pos = vec3(gl_in[0].gl_Position.xy + ((attribIn[0].size * positions[j] * 0.5)), gl_in[0].gl_Position.z);
+        gl_Position = projection * vec4(pos, 1.0);
 
-            attribOut.color = attribIn[i].color;
-            attribOut.texCoords = texPositions[j];
-            EmitVertex();
-        }
+        attribOut.color = attribIn[0].color;
+        attribOut.texCoords = texPositions[j];
+        EmitVertex();
     }
 }
