@@ -97,21 +97,6 @@ ParticleScene::ParticleScene(Resources& resources, Window& w)
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo[0]);
     glBufferData(GL_ARRAY_BUFFER, MAX_N_PARTICULES * sizeof(Particle), particles, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 13 * sizeof(float),  (GLvoid*) nullptr);
-    glEnableVertexAttribArray(0);
-
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 13 * sizeof(float),  (GLvoid*) (sizeof(float) * 3));
-    glEnableVertexAttribArray(1);
-
-    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 13 * sizeof(float),  (GLvoid*) (sizeof(float) * 6));
-    glEnableVertexAttribArray(2);
-
-    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 13 * sizeof(float),  (GLvoid*) (sizeof(float) * 10));
-    glEnableVertexAttribArray(3);
-
-    glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, 13 * sizeof(float),  (GLvoid*) (sizeof(float) * 12));
-    glEnableVertexAttribArray(4);
-
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo[1]);
     glBufferData(GL_ARRAY_BUFFER, MAX_N_PARTICULES * sizeof(Particle), nullptr, GL_STATIC_READ);
     glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, this->m_tfo);
@@ -144,17 +129,30 @@ void ParticleScene::render(glm::mat4& view, glm::mat4& projPersp)
     // buffer binding
     glBindVertexArray(m_vao);
     glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_tfo);
-    glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0,m_vbo[1]);
+
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo[0]);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 13 * sizeof(float),  (GLvoid*) nullptr);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 13 * sizeof(float),  (GLvoid*) (sizeof(float) * 3));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 13 * sizeof(float),  (GLvoid*) (sizeof(float) * 6));
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 13 * sizeof(float),  (GLvoid*) (sizeof(float) * 10));
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, 13 * sizeof(float),  (GLvoid*) (sizeof(float) * 12));
+    glEnableVertexAttribArray(4);
+
+    glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0,m_vbo[1]);
+
     glUniform1f(m_res.timeLocationTransformFeedback, time);
     glUniform1f(m_res.dtLocationTransformFeedback, dt);
 
     // update particles
-    glEnable(GL_RASTERIZER_DISCARD);
     glBeginTransformFeedback(GL_POINTS);
+    glEnable(GL_RASTERIZER_DISCARD);
     glDrawArrays(GL_POINTS, 0, m_nParticles);
-    glEndTransformFeedback();
     glDisable(GL_RASTERIZER_DISCARD);
+    glEndTransformFeedback();
 
     // swap buffers
     std::swap(m_vbo[0], m_vbo[1]);
@@ -176,7 +174,17 @@ void ParticleScene::render(glm::mat4& view, glm::mat4& projPersp)
 
     // TODO: buffer binding
     glBindVertexArray(this->m_vao);
-    glBindBuffer(GL_ARRAY_BUFFER, this->m_vbo[1]);
+    glBindBuffer(GL_ARRAY_BUFFER, this->m_vbo[0]);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 13 * sizeof(float),  (GLvoid*) nullptr);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 13 * sizeof(float),  (GLvoid*) (sizeof(float) * 3));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 13 * sizeof(float),  (GLvoid*) (sizeof(float) * 6));
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 13 * sizeof(float),  (GLvoid*) (sizeof(float) * 10));
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, 13 * sizeof(float),  (GLvoid*) (sizeof(float) * 12));
+    glEnableVertexAttribArray(4);
 
     modelView = view;
     glUniformMatrix4fv(m_res.modelViewLocationParticle, 1, GL_FALSE, &modelView[0][0]);
