@@ -76,7 +76,7 @@ void TesselationScene::drawMenu()
 }
 
 
-static const unsigned int MAX_N_PARTICULES = 1;
+static const unsigned int MAX_N_PARTICULES = 10000;
 static Particle particles[MAX_N_PARTICULES] = { {{0,0,0},{0,0,0},{0,0,0,0}, {0,0},0} };
 
 ParticleScene::ParticleScene(Resources& resources, Window& w)
@@ -144,15 +144,15 @@ void ParticleScene::render(glm::mat4& view, glm::mat4& projPersp)
     // buffer binding
     glBindVertexArray(m_vao);
     glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_tfo);
+    glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0,m_vbo[1]);
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo[0]);
     glUniform1f(m_res.timeLocationTransformFeedback, time);
     glUniform1f(m_res.dtLocationTransformFeedback, dt);
-    glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0,m_vbo[1]);
 
     // update particles
     glEnable(GL_RASTERIZER_DISCARD);
     glBeginTransformFeedback(GL_POINTS);
-    glDrawArrays(GL_POINTS, 0, MAX_N_PARTICULES);
+    glDrawArrays(GL_POINTS, 0, m_nParticles);
     glEndTransformFeedback();
     glDisable(GL_RASTERIZER_DISCARD);
 
@@ -160,10 +160,15 @@ void ParticleScene::render(glm::mat4& view, glm::mat4& projPersp)
     m_w.swap();
 
     // Draw skybox first without the function to change some parameter on the depth test.
+    glDepthFunc(GL_LEQUAL);
     glDepthMask(GL_FALSE);
+    m_res.skyboxShader.use();
+    m_res.skyboxTexture.use();
     mvp = projPersp * glm::mat4(glm::mat3(view));
-    drawSky(mvp);
+    glUniformMatrix4fv(m_res.mvpLocationSky, 1, GL_FALSE, &mvp[0][0]);
+    m_res.skybox.draw(GL_TRIANGLES, 6 * 6);
     glDepthMask(GL_TRUE);
+    glDepthFunc(GL_LESS);
 
 
     m_res.particule.use();
@@ -172,6 +177,7 @@ void ParticleScene::render(glm::mat4& view, glm::mat4& projPersp)
     // TODO: buffer binding
     glBindVertexArray(this->m_vao);
     glBindBuffer(GL_ARRAY_BUFFER, this->m_vbo[1]);
+
     modelView = view;
     glUniformMatrix4fv(m_res.modelViewLocationParticle, 1, GL_FALSE, &modelView[0][0]);
     glUniformMatrix4fv(m_res.projectionLocationParticle, 1, GL_FALSE, &projPersp[0][0]);
@@ -181,7 +187,7 @@ void ParticleScene::render(glm::mat4& view, glm::mat4& projPersp)
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    glDrawBuffer(GL_POINTS);
+    glDrawArrays(GL_POINTS, 0, m_nParticles);
 
     glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
