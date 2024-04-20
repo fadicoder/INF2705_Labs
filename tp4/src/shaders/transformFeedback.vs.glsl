@@ -58,22 +58,21 @@ const vec3 ORANGE_COLOR = vec3(1.0f, 0.4f, 0.2f);
 const vec3 DARK_RED_COLOR = vec3(0.1, 0.0, 0.0);
 
 const vec3 ACCELERATION = vec3(0.0f, 0.1f, 0.0f);
+const vec2 INITIAL_SIZE = vec2(0.5, 1.0);
 
 void main()
 {
     if (timeToLive < 0.0){
         // Init particule
         positionMod = randomInCircle(INITIAL_RADIUS, INITIAL_HEIGHT);
-        // Direction
-        vec3 direction = randomInCircle(FINAL_RADIUS, FINAL_HEIGHT);
         // Speed
-        velocityMod = vec3(direction.x, direction.y, randomBetween(INITIAL_SPEED_MIN, INITIAL_SPEED_MAX));
+        velocityMod = normalize(randomInCircle(FINAL_RADIUS, FINAL_HEIGHT)) * randomBetween(INITIAL_SPEED_MIN, INITIAL_SPEED_MAX);
         // TTL
         timeToLiveMod = randomBetween(1.7, 2.0);
         // Color
-        colorMod = vec4(YELLOW_COLOR.r, YELLOW_COLOR.g, YELLOW_COLOR.b, INITIAL_ALPHA);
+        colorMod = vec4(YELLOW_COLOR, INITIAL_ALPHA);
         // Size
-        sizeMod = vec2(1.0, 1.0);
+        sizeMod = INITIAL_SIZE;
         return;
     }
 
@@ -82,7 +81,7 @@ void main()
     positionMod = positionMod + (velocity * dt);
     velocityMod = velocity + (ACCELERATION * dt);
 
-    vec3 nextColor = DARK_RED_COLOR;
+    vec3 nextColor;
     if (timeToLiveNormalised < 0.25) {
         nextColor = YELLOW_COLOR;
     } else if (timeToLiveNormalised < 0.3) {
@@ -92,8 +91,8 @@ void main()
     } else {
         nextColor = smoothstep(ORANGE_COLOR, DARK_RED_COLOR, vec3(timeToLiveNormalised));
     }
-    float alpha = smoothstep(0.0, 0.2, color.a) * 1 - smoothstep(0.8, 1, color.a);
-    colorMod = vec4(nextColor.r, nextColor.g, nextColor.b, alpha);
-    sizeMod = size * mix(1.0, 1.5, timeToLiveNormalised);
+    float alpha = ALPHA * smoothstep(0.0, 0.2, timeToLiveNormalised) * 1 - smoothstep(0.8, 1, timeToLiveNormalised);
+    colorMod = vec4(nextColor, alpha);
+    sizeMod = INITIAL_SIZE * mix(1.0, 1.5, timeToLiveNormalised);
     timeToLiveMod = timeToLive - dt;
 }

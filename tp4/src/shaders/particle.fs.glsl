@@ -13,7 +13,8 @@ in ATTRIB_GS_OUT
 
 void main()
 {
-    vec4 texel = texture(textureSampler, attribIn.texCoords.st);
+    vec4 texel = texture(textureSampler, attribIn.texCoords);
     if (texel.a < 0.05) discard;
-    FragColor = clamp(texel.rgba + attribIn.color, 0.0, 1.0);
+    FragColor = clamp(texel.rgba * attribIn.color, 0.0, 1.0);
+//    FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 }

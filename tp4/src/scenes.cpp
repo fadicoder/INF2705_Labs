@@ -3,7 +3,7 @@
 #include <iostream>
 
 #define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -85,21 +85,26 @@ ParticleScene::ParticleScene(Resources& resources, Window& w)
 , m_oldTime(m_w.getTick() / 1000.0f)
 , m_cumulativeTime(0.0f)
 , m_nParticles(1)
-, m_nMaxParticles(1000)
+, m_nMaxParticles(MAX_N_PARTICULES)
 {
     glEnable(GL_PROGRAM_POINT_SIZE);
 
     glGenVertexArrays(1, &m_vao);
-    glBindVertexArray(m_vao);
+//    glBindVertexArray(m_vao);
     glGenBuffers(2, m_vbo);
     glGenTransformFeedbacks(1, &m_tfo);
 
+    glBindVertexArray(m_vao);
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo[0]);
-    glBufferData(GL_ARRAY_BUFFER, MAX_N_PARTICULES * sizeof(Particle), particles, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, MAX_N_PARTICULES * sizeof(particles), particles, GL_DYNAMIC_COPY);
 
-    glBindBuffer(GL_ARRAY_BUFFER, m_vbo[1]);
-    glBufferData(GL_ARRAY_BUFFER, MAX_N_PARTICULES * sizeof(Particle), nullptr, GL_STATIC_READ);
     glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, this->m_tfo);
+    glBindBuffer(GL_ARRAY_BUFFER, m_vbo[1]);
+    glBufferData(GL_ARRAY_BUFFER, MAX_N_PARTICULES * sizeof(particles), nullptr, GL_STREAM_READ);
+
+    // Unbind data
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
     GL_CHECK_ERROR;
 }
 
@@ -125,13 +130,13 @@ void ParticleScene::render(glm::mat4& view, glm::mat4& projPersp)
         m_nParticles = 1;
 
     m_res.transformFeedback.use();
-    
+
     // buffer binding
     glBindVertexArray(m_vao);
     glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_tfo);
 
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo[0]);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 13 * sizeof(float),  (GLvoid*) nullptr);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 13 * sizeof(float),  (GLvoid*) offsetof(Particle, position));
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 13 * sizeof(float),  (GLvoid*) (sizeof(float) * 3));
     glEnableVertexAttribArray(1);
@@ -150,7 +155,7 @@ void ParticleScene::render(glm::mat4& view, glm::mat4& projPersp)
     // update particles
     glBeginTransformFeedback(GL_POINTS);
     glEnable(GL_RASTERIZER_DISCARD);
-    glDrawArrays(GL_POINTS, 0, m_nParticles);
+    glDrawArrays(GL_POINTS, 0, (GLsizei) m_nParticles);
     glDisable(GL_RASTERIZER_DISCARD);
     glEndTransformFeedback();
 
@@ -188,17 +193,15 @@ void ParticleScene::render(glm::mat4& view, glm::mat4& projPersp)
 
     modelView = view;
     glUniformMatrix4fv(m_res.modelViewLocationParticle, 1, GL_FALSE, &modelView[0][0]);
-    glUniformMatrix4fv(m_res.projectionLocationParticle, 1, GL_FALSE, &projPersp[0][0]);
+    glUniformMatrix4fv(m_res.projectionLocationParticle, 1, GL_FALSE, &projView[0][0]);
 
     // TODO: Draw particles without depth write and with blending
-    glDisable(GL_DEPTH_TEST);
+    glDepthMask(false);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    glDrawArrays(GL_POINTS, 0, m_nParticles);
-
+    glDrawArrays(GL_POINTS, 0, (GLsizei) m_nParticles);
     glDisable(GL_BLEND);
-    glEnable(GL_DEPTH_TEST);
+    glDepthMask(true);
     GL_CHECK_ERROR;
 
     if (m_cumulativeTime > 1.0f / 60.0f)
