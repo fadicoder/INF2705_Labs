@@ -180,15 +180,15 @@ void ParticleScene::render(glm::mat4& view, glm::mat4& projPersp)
     // TODO: buffer binding
     glBindVertexArray(this->m_vao);
     glBindBuffer(GL_ARRAY_BUFFER, this->m_vbo[0]);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 13 * sizeof(float),  (GLvoid*) nullptr);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Particle),  (GLvoid*) (sizeof(float) * 3));
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 13 * sizeof(float),  (GLvoid*) (sizeof(float) * 3));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Particle),  (GLvoid*) (sizeof(float) * 3));
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 13 * sizeof(float),  (GLvoid*) (sizeof(float) * 6));
+    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Particle),  (GLvoid*) (sizeof(float) * 6));
     glEnableVertexAttribArray(2);
-    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 13 * sizeof(float),  (GLvoid*) (sizeof(float) * 10));
+    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Particle),  (GLvoid*) (sizeof(float) * 10));
     glEnableVertexAttribArray(3);
-    glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, 13 * sizeof(float),  (GLvoid*) (sizeof(float) * 12));
+    glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(Particle),  (GLvoid*) (sizeof(float) * 12));
     glEnableVertexAttribArray(4);
 
     modelView = view;
