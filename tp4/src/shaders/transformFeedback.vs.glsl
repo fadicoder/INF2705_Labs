@@ -85,11 +85,11 @@ void main()
     if (timeToLiveNormalised < 0.25) {
         nextColor = YELLOW_COLOR;
     } else if (timeToLiveNormalised < 0.3) {
-        nextColor = smoothstep(YELLOW_COLOR, ORANGE_COLOR, vec3(timeToLiveNormalised));
+        nextColor = mix(YELLOW_COLOR, ORANGE_COLOR, (timeToLiveNormalised - 0.3) / 0.05);
     } else if (timeToLiveNormalised < 0.5) {
         nextColor = ORANGE_COLOR;
     } else {
-        nextColor = smoothstep(ORANGE_COLOR, DARK_RED_COLOR, vec3(timeToLiveNormalised));
+        nextColor = mix(ORANGE_COLOR, DARK_RED_COLOR, (timeToLiveNormalised- 0.5) * 2.0);
     }
     float alpha = ALPHA * smoothstep(0.0, 0.2, timeToLiveNormalised) * 1 - smoothstep(0.8, 1, timeToLiveNormalised);
     colorMod = vec4(nextColor, alpha);
