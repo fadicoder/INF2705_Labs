@@ -199,6 +199,7 @@ void ParticleScene::render(glm::mat4& view, glm::mat4& projPersp)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDrawArrays(GL_POINTS, 0, (GLsizei) m_nParticles);
     glDisable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
     glDepthMask(true);
     GL_CHECK_ERROR;
 
