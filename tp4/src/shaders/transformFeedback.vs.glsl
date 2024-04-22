@@ -72,27 +72,27 @@ void main()
         // Color
         colorMod = vec4(YELLOW_COLOR, INITIAL_ALPHA);
         // Size
-        sizeMod = INITIAL_SIZE;
+        sizeMod = vec2(INITIAL_SIZE.x / 2.0, INITIAL_SIZE.y);
         return;
     }
 
-    float timeToLiveNormalised = 1 - (timeToLive / MAX_TIME_TO_LIVE);
+    float timeToLiveNormalised = clamp(1 - (timeToLive / MAX_TIME_TO_LIVE), 0.0, 1.0);
 
     positionMod = positionMod + (velocity * dt);
     velocityMod = velocity + (ACCELERATION * dt);
+    timeToLiveMod = timeToLive - dt;
 
     vec3 nextColor;
     if (timeToLiveNormalised < 0.25) {
         nextColor = YELLOW_COLOR;
     } else if (timeToLiveNormalised < 0.3) {
-        nextColor = mix(YELLOW_COLOR, ORANGE_COLOR, (timeToLiveNormalised - 0.3) / 0.05);
+        nextColor = mix(YELLOW_COLOR, ORANGE_COLOR, smoothstep(0.25, 0.3, timeToLiveNormalised));
     } else if (timeToLiveNormalised < 0.5) {
         nextColor = ORANGE_COLOR;
     } else {
-        nextColor = mix(ORANGE_COLOR, DARK_RED_COLOR, (timeToLiveNormalised- 0.5) * 2.0);
+        nextColor = mix(ORANGE_COLOR, DARK_RED_COLOR, smoothstep(0.5, 1.0, timeToLiveNormalised));
     }
-    float alpha = ALPHA * smoothstep(0.0, 0.2, timeToLiveNormalised) * 1 - smoothstep(0.8, 1, timeToLiveNormalised);
+    float alpha = ALPHA * (smoothstep(0.0, 0.2, timeToLiveNormalised)) * (1 - smoothstep(0.8, 1, timeToLiveNormalised));
     colorMod = vec4(nextColor, alpha);
     sizeMod = INITIAL_SIZE * mix(1.0, 1.5, timeToLiveNormalised);
-    timeToLiveMod = timeToLive - dt;
 }
